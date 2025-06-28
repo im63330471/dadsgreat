@@ -1,0 +1,79 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: #f5ede3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+.logo {
+    font-size: 2.8rem;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    color: #4b2e05;
+    margin-bottom: 1.2rem;
+    text-shadow: 2px 4px 12px #e2cdb1;
+    text-align: left;
+    width: 100%;
+    max-width: 210mm;
+}
+.slogan {
+    font-size: 1.15rem;
+    color: #6d4c1c;
+    margin-bottom: 1rem;
+    max-width: 420px;
+    text-align: left;
+    width: 100%;
+    max-width: 210mm;
+}
+/* Match table dot size override */
+.match-table .dot {
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
+    text-align: left;
+    color: #bfa16b;
+    font-size: 3rem;
+    line-height: 1;
+}
+.match-table .dot.right {
+    text-align: right;
+}
+
+.content {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.materials-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff8f0;
+    box-shadow: 0 2px 12px #e2cdb1a0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.materials-table th, .materials-table td {
+    padding: 1rem 0.5rem;
+    text-align: left;
+}
+.materials-table th {
+    background: #f7b267;
+    color: #4b2e05;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-bottom: 2px solid #e2cdb1;
+}
+.materials-table td {
+    color: #6d4c1c;
+    font-size: 1rem;
+    border-bottom: 1px solid #f5ede3;
+}
+.materials-table tr:last-child td {
+    border-bottom: none;
+}
