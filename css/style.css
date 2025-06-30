@@ -29,12 +29,8 @@ body {
     width: 100%;
 }
 .match-table .dot {
-    color: #bfa16b;
-    line-height: 1;
-    width: 32px;
-    font-weight: 500;
+    font-weight: 750;
     font-size: 3rem;
-    text-align: left;
     padding-left: 1.2rem;
 }
 .match-table .dot.right {
@@ -66,7 +62,7 @@ body {
     height: 84px;
     object-fit: contain;
     border-radius: 8px;
-    box-shadow: 0 2px 8px #e2cdb1a0;
+    box-shadow: 0 2px 8px #ecdcc9a0;
 }
 .content {
     width: 100%;
