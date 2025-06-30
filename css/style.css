@@ -23,16 +23,50 @@ body {
     width: 100%;
     max-width: 210mm;
 }
+.match-table {
+    border-collapse: collapse;
+    table-layout: auto;
+    width: 100%;
+}
 .match-table .dot {
-    text-align: left;
     color: #bfa16b;
-    font-size: 3rem;
     line-height: 1;
-    margin-left: 1rem;
+    width: 32px;
+    font-weight: 500;
+    font-size: 3rem;
+    text-align: left;
+    padding-left: 1.2rem;
 }
 .match-table .dot.right {
     text-align: right;
-    margin-right: 1rem;
+    padding-right: 1.2rem;
+}
+.match-table td {
+    border: none;
+    vertical-align: middle;   
+}
+.match-table col.col1 {
+    width: 30%;
+}
+.match-table col.col2 {
+    width: 25%;
+}
+.match-table col.col3 {
+    width: 25%;
+}
+.match-table col.col4 {
+    width: 20%;
+}
+.match-table .animal-name {
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 64px;
+}
+.match-table .animal-img {
+    height: 84px;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #e2cdb1a0;
 }
 .content {
     width: 100%;
@@ -41,7 +75,6 @@ body {
     flex-direction: column;
     align-items: center;
 }
-
 .materials-table {
     width: 100%;
     border-collapse: collapse;
@@ -51,21 +84,17 @@ body {
     overflow: hidden;
 }
 .materials-table th, .materials-table td {
-    padding: 1rem 0.5rem;
     text-align: left;
+    padding: 1rem 0.5rem;
+    border-bottom: 2px solid #f5ede3;
 }
 .materials-table th {
     background: #f7b267;
     color: #4b2e05;
     font-size: 1.1rem;
     font-weight: 700;
-    border-bottom: 2px solid #e2cdb1;
 }
 .materials-table td {
     color: #6d4c1c;
     font-size: 1rem;
-    border-bottom: 1px solid #f5ede3;
-}
-.materials-table tr:last-child td {
-    border-bottom: none;
 }
