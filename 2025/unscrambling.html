@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sentence Builder Game</title>
+    <title>Unscramble the Sentences</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 </head>
 <body>
@@ -23,14 +23,14 @@
 
     let currentSentence = [];
     let blocks = [];
-    let dropAreaY = 400;
+    let dropAreaY = 180;
     let score = 0;
     let questionNumber = 0;
-    let maxQuestions = 10;
+    let maxQuestions = 5;
     let gameState = 'playing';
     let correctResponses = [];
     let wrongResponses = [];
-    let submitButton, resetButton;
+    let submitButton, resetButton, restartButton;
     let draggedBlock = null;
 
     // Block class to handle dragging and display
@@ -48,7 +48,7 @@
 
         display() {
             stroke(this.isCorrect === true ? color(0, 255, 0) : this.isCorrect === false ? color(255, 0, 0) : 0);
-            strokeWeight(2);
+            strokeWeight(1); // unified border width
             fill(this.color);
             rect(this.x, this.y, this.width, this.height, 5);
             fill(0);
@@ -77,7 +77,7 @@
         display() {
             fill(200, 200, 255);
             stroke(0);
-            strokeWeight(1);
+            strokeWeight(1); // unified border width
             rect(this.x, this.y, this.width, this.height, 5);
             fill(0);
             noStroke();
@@ -93,124 +93,159 @@
         }
     }
 
-    function setup() {
-        createCanvas(600, 500);
-        textFont('Arial');
-        resetQuestion();
-        submitButton = new Button('Submit', 400, 450, checkAnswer);
-        resetButton = new Button('Reset', 500, 450, resetQuestion);
-    }
+function setup() {
+    createCanvas(600, 500);
+    textFont('Arial');
+    resetQuestion();
+    // Centered under drop area, side by side
+    let btnY = dropAreaY + 120;
+    let btnSpacing = 20;
+    let btnStartX = width / 2 - 100 - btnSpacing / 2;
+    submitButton = new Button('Submit', btnStartX, btnY, checkAnswer);
+    resetButton = new Button('Reset', btnStartX + 100 + btnSpacing, btnY, resetBlocks);
+    restartButton = new Button('Restart', width / 2 - 50, btnY + 60, restartGame);
+}
+function restartGame() {
+    // Reset all game state
+    score = 0;
+    questionNumber = 0;
+    correctResponses = [];
+    wrongResponses = [];
+    gameState = 'playing';
+    resetQuestion();
+}
 
-    function resetQuestion() {
-        if (questionNumber < maxQuestions) {
-            // Select random sentence and shuffle its chunks
-            currentSentence = random(sentences).slice();
-            let shuffled = currentSentence.slice().sort(() => random(-1, 1));
-            blocks = [];
-            // Create blocks with random bright colors
-            for (let i = 0; i < shuffled.length; i++) {
-                let col = color(random(100, 255), random(100, 255), random(100, 255));
-                blocks.push(new Block(shuffled[i], 50 + i * 100, 50, col));
-            }
-            questionNumber++;
-        } else {
-            gameState = 'end';
+function resetQuestion() {
+    if (questionNumber < maxQuestions) {
+        currentSentence = random(sentences).slice();
+        let shuffled = currentSentence.slice().sort(() => random(-1, 1));
+        blocks = [];
+        let totalWidth = shuffled.length * 90;
+        let startX = width / 2 - totalWidth / 2;
+        for (let i = 0; i < shuffled.length; i++) {
+            let col = color(random(100, 255), random(100, 255), random(100, 255));
+            blocks.push(new Block(shuffled[i], startX + i * 90, 50, col));
         }
+        questionNumber++;
+    } else {
+        gameState = 'end';
     }
+}
 
-    function checkAnswer() {
-        // Filter blocks in drop area (y > 350)
-        let droppedBlocks = blocks.filter(b => b.y > 350).sort((a, b) => a.x - b.x);
-        let droppedSentence = droppedBlocks.map(b => b.text);
-        let isCorrect = droppedSentence.join('') === currentSentence.join('');
+function checkAnswer() {
+    // Filter blocks in drop area (y > dropAreaY)
+    let droppedBlocks = blocks.filter(b => b.y > dropAreaY).sort((a, b) => a.x - b.x);
+    let droppedSentence = droppedBlocks.map(b => b.text);
+    let isCorrect = droppedSentence.join(' ') === currentSentence.join(' ');
 
-        // Set block outlines based on correctness
-        droppedBlocks.forEach((block, i) => {
-            block.isCorrect = i < currentSentence.length && block.text === currentSentence[i];
+    // Set block outlines based on correctness
+    droppedBlocks.forEach((block, i) => {
+        block.isCorrect = i < currentSentence.length && block.text === currentSentence[i];
+    });
+
+    if (isCorrect && droppedSentence.length === currentSentence.length) {
+        score++;
+        correctResponses.push(currentSentence.join(' '));
+    } else if (droppedSentence.length > 0) {
+        wrongResponses.push({
+            user: droppedSentence.join(' '),
+            correct: currentSentence.join(' ')
         });
-
-        if (isCorrect && droppedSentence.length === currentSentence.length) {
-            score++;
-            correctResponses.push(currentSentence.join(' '));
-        } else if (droppedSentence.length > 0) {
-            wrongResponses.push({
-                user: droppedSentence.join(' '),
-                correct: currentSentence.join(' ')
-            });
-        }
-
-        // Move to next question after a short delay
-        setTimeout(resetQuestion, 1000);
     }
 
-    function draw() {
+    // Move to next question after a short delay
+    setTimeout(resetQuestion, 500);
+}
+function resetBlocks() {
+    if (blocks.length > 0) {
+        let totalWidth = blocks.length * 90;
+        let startX = width / 2 - totalWidth / 2;
+        for (let i = 0; i < blocks.length; i++) {
+            blocks[i].x = startX + i * 90;
+            blocks[i].y = 50;
+            blocks[i].isCorrect = null;
+        }
+    }
+}
+function draw() {
+    background(255);
+
+    // Center all game content horizontally
+    push();
+    translate((width - 600) / 2, 0); // If canvas is wider, center content
+
+    if (gameState === 'playing') {
+        // Draw drop area
+        fill(220);
+        noStroke();
+        rect(0, dropAreaY, 600, 100);
+        textAlign(CENTER);
+        fill(0);
+        textSize(16);
+        text(`Question ${questionNumber} of ${maxQuestions} | Score: ${score}`, 300, 20);
+
+        // Draw blocks
+        for (let block of blocks) {
+            block.display();
+        }
+
+        // Draw buttons (centered under drop area, side by side)
+        submitButton.display();
+        resetButton.display();
+    } else {
+        // End screen
         background(255);
+        textAlign(CENTER);
+        fill(255, 215, 0); // Gold for score
+        textSize(32);
+        text(`Game Over! Score: ${score}/${maxQuestions}`, 300, 50);
 
-        if (gameState === 'playing') {
-            // Draw drop area
-            fill(220);
-            noStroke();
-            rect(0, dropAreaY, width, 100);
-            textAlign(CENTER);
-            fill(0);
-            textSize(16);
-            text(`Question ${questionNumber} of ${maxQuestions} | Score: ${score}`, width / 2, 20);
+        // Correct responses
+        fill(0, 128, 0); // Green
+        textSize(20);
+        text('Correct Sentences:', 300, 100);
+        textAlign(LEFT);
+        textSize(16);
+        for (let i = 0; i < correctResponses.length; i++) {
+            text(`${i + 1}. ${correctResponses[i]}`, 50, 130 + i * 30);
+        }
 
-            // Draw blocks
-            for (let block of blocks) {
-                block.display();
-            }
+        // Wrong responses
+        fill(255, 0, 0); // Red
+        textAlign(CENTER);
+        textSize(20);
+        text('Incorrect Sentences:', 300, 130 + correctResponses.length * 30 + 20);
+        textAlign(LEFT);
+        textSize(16);
+        for (let i = 0; i < wrongResponses.length; i++) {
+            text(`${i + 1}. You: ${wrongResponses[i].user} | Correct: ${wrongResponses[i].correct}`, 50, 160 + (correctResponses.length + i) * 30 + 20);
+        }
 
-            // Draw buttons
-            submitButton.display();
-            resetButton.display();
-        } else {
-            // End screen
-            background(255);
-            textAlign(CENTER);
-            fill(255, 215, 0); // Gold for score
-            textSize(32);
-            text(`Game Over! Score: ${score}/${maxQuestions}`, width / 2, 50);
+        // Draw restart button
+        restartButton.display();
+    }
+    pop();
+}
 
-            // Correct responses
-            fill(0, 128, 0); // Green
-            textSize(20);
-            text('Correct Sentences:', width / 2, 100);
-            textAlign(LEFT);
-            textSize(16);
-            for (let i = 0; i < correctResponses.length; i++) {
-                text(`${i + 1}. ${correctResponses[i]}`, 50, 130 + i * 30);
-            }
+function mousePressed() {
+    if (gameState === 'playing') {
+        // Check for button clicks
+        submitButton.clicked(mouseX, mouseY);
+        resetButton.clicked(mouseX, mouseY);
 
-            // Wrong responses
-            fill(255, 0, 0); // Red
-            textAlign(CENTER);
-            textSize(20);
-            text('Incorrect Sentences:', width / 2, 130 + correctResponses.length * 30 + 20);
-            textAlign(LEFT);
-            textSize(16);
-            for (let i = 0; i < wrongResponses.length; i++) {
-                text(`${i + 1}. You: ${wrongResponses[i].user} | Correct: ${wrongResponses[i].correct}`, 50, 160 + (correctResponses.length + i) * 30 + 20);
+        // Start dragging a block
+        for (let block of blocks) {
+            if (block.contains(mouseX, mouseY)) {
+                draggedBlock = block;
+                draggedBlock.isDragging = true;
+                break;
             }
         }
+    } else if (gameState === 'end') {
+        // Check for restart button click
+        restartButton.clicked(mouseX, mouseY);
     }
-
-    function mousePressed() {
-        if (gameState === 'playing') {
-            // Check for button clicks
-            submitButton.clicked(mouseX, mouseY);
-            resetButton.clicked(mouseX, mouseY);
-
-            // Start dragging a block
-            for (let block of blocks) {
-                if (block.contains(mouseX, mouseY)) {
-                    draggedBlock = block;
-                    draggedBlock.isDragging = true;
-                    break;
-                }
-            }
-        }
-    }
+}
 
     function mouseDragged() {
         if (draggedBlock) {
