@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentence Builder Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+</head>
+<body>
+<script>
+    // Sentence database: nested list of sentences with varied chunk sizes
+    const sentences = [
+        ['I', 'want', 'her', 'so', 'much.'],
+        ['She', 'loves', 'me', 'so much'],
+        ['We', 'got', 'married', 'at last.'],
+        ['He', 'runs', 'very fast'],
+        ['They', 'enjoy', 'playing', 'together'],
+        ['The cat', 'sleeps', 'all day'],
+        ['We', 'will', 'meet', 'tomorrow'],
+        ['She', 'sings', 'beautifully'],
+        ['I', 'saw', 'a', 'bright star'],
+        ['You', 'are', 'my', 'best friend']
+    ];
+
+    let currentSentence = [];
+    let blocks = [];
+    let dropAreaY = 400;
+    let score = 0;
+    let questionNumber = 0;
+    let maxQuestions = 10;
+    let gameState = 'playing';
+    let correctResponses = [];
+    let wrongResponses = [];
+    let submitButton, resetButton;
+    let draggedBlock = null;
+
+    // Block class to handle dragging and display
+    class Block {
+        constructor(text, x, y, color) {
+            this.text = text;
+            this.x = x;
+            this.y = y;
+            this.width = 80;
+            this.height = 40;
+            this.color = color;
+            this.isDragging = false;
+            this.isCorrect = null;
+        }
+
+        display() {
+            stroke(this.isCorrect === true ? color(0, 255, 0) : this.isCorrect === false ? color(255, 0, 0) : 0);
+            strokeWeight(2);
+            fill(this.color);
+            rect(this.x, this.y, this.width, this.height, 5);
+            fill(0);
+            noStroke();
+            textAlign(CENTER, CENTER);
+            textSize(16);
+            text(this.text, this.x + this.width / 2, this.y + this.height / 2);
+        }
+
+        contains(mx, my) {
+            return mx > this.x && mx < this.x + this.width && my > this.y && my < this.y + this.height;
+        }
+    }
+
+    // Button class for Submit and Reset buttons
+    class Button {
+        constructor(text, x, y, action) {
+            this.text = text;
+            this.x = x;
+            this.y = y;
+            this.width = 100;
+            this.height = 40;
+            this.action = action;
+        }
+
+        display() {
+            fill(200, 200, 255);
+            stroke(0);
+            strokeWeight(1);
+            rect(this.x, this.y, this.width, this.height, 5);
+            fill(0);
+            noStroke();
+            textAlign(CENTER, CENTER);
+            textSize(16);
+            text(this.text, this.x + this.width / 2, this.y + this.height / 2);
+        }
+
+        clicked(mx, my) {
+            if (mx > this.x && mx < this.x + this.width && my > this.y && my < this.y + this.height) {
+                this.action();
+            }
+        }
+    }
+
+    function setup() {
+        createCanvas(600, 500);
+        textFont('Arial');
+        resetQuestion();
+        submitButton = new Button('Submit', 400, 450, checkAnswer);
+        resetButton = new Button('Reset', 500, 450, resetQuestion);
+    }
+
+    function resetQuestion() {
+        if (questionNumber < maxQuestions) {
+            // Select random sentence and shuffle its chunks
+            currentSentence = random(sentences).slice();
+            let shuffled = currentSentence.slice().sort(() => random(-1, 1));
+            blocks = [];
+            // Create blocks with random bright colors
+            for (let i = 0; i < shuffled.length; i++) {
+                let col = color(random(100, 255), random(100, 255), random(100, 255));
+                blocks.push(new Block(shuffled[i], 50 + i * 100, 50, col));
+            }
+            questionNumber++;
+        } else {
+            gameState = 'end';
+        }
+    }
+
+    function checkAnswer() {
+        // Filter blocks in drop area (y > 350)
+        let droppedBlocks = blocks.filter(b => b.y > 350).sort((a, b) => a.x - b.x);
+        let droppedSentence = droppedBlocks.map(b => b.text);
+        let isCorrect = droppedSentence.join('') === currentSentence.join('');
+
+        // Set block outlines based on correctness
+        droppedBlocks.forEach((block, i) => {
+            block.isCorrect = i < currentSentence.length && block.text === currentSentence[i];
+        });
+
+        if (isCorrect && droppedSentence.length === currentSentence.length) {
+            score++;
+            correctResponses.push(currentSentence.join(' '));
+        } else if (droppedSentence.length > 0) {
+            wrongResponses.push({
+                user: droppedSentence.join(' '),
+                correct: currentSentence.join(' ')
+            });
+        }
+
+        // Move to next question after a short delay
+        setTimeout(resetQuestion, 1000);
+    }
+
+    function draw() {
+        background(255);
+
+        if (gameState === 'playing') {
+            // Draw drop area
+            fill(220);
+            noStroke();
+            rect(0, dropAreaY, width, 100);
+            textAlign(CENTER);
+            fill(0);
+            textSize(16);
+            text(`Question ${questionNumber} of ${maxQuestions} | Score: ${score}`, width / 2, 20);
+
+            // Draw blocks
+            for (let block of blocks) {
+                block.display();
+            }
+
+            // Draw buttons
+            submitButton.display();
+            resetButton.display();
+        } else {
+            // End screen
+            background(255);
+            textAlign(CENTER);
+            fill(255, 215, 0); // Gold for score
+            textSize(32);
+            text(`Game Over! Score: ${score}/${maxQuestions}`, width / 2, 50);
+
+            // Correct responses
+            fill(0, 128, 0); // Green
+            textSize(20);
+            text('Correct Sentences:', width / 2, 100);
+            textAlign(LEFT);
+            textSize(16);
+            for (let i = 0; i < correctResponses.length; i++) {
+                text(`${i + 1}. ${correctResponses[i]}`, 50, 130 + i * 30);
+            }
+
+            // Wrong responses
+            fill(255, 0, 0); // Red
+            textAlign(CENTER);
+            textSize(20);
+            text('Incorrect Sentences:', width / 2, 130 + correctResponses.length * 30 + 20);
+            textAlign(LEFT);
+            textSize(16);
+            for (let i = 0; i < wrongResponses.length; i++) {
+                text(`${i + 1}. You: ${wrongResponses[i].user} | Correct: ${wrongResponses[i].correct}`, 50, 160 + (correctResponses.length + i) * 30 + 20);
+            }
+        }
+    }
+
+    function mousePressed() {
+        if (gameState === 'playing') {
+            // Check for button clicks
+            submitButton.clicked(mouseX, mouseY);
+            resetButton.clicked(mouseX, mouseY);
+
+            // Start dragging a block
+            for (let block of blocks) {
+                if (block.contains(mouseX, mouseY)) {
+                    draggedBlock = block;
+                    draggedBlock.isDragging = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    function mouseDragged() {
+        if (draggedBlock) {
+            draggedBlock.x = mouseX - draggedBlock.width / 2;
+            draggedBlock.y = mouseY - draggedBlock.height / 2;
+        }
+    }
+
+    function mouseReleased() {
+        if (draggedBlock) {
+            draggedBlock.isDragging = false;
+            draggedBlock = null;
+        }
+    }
+</script>
+</body>
+</html>
