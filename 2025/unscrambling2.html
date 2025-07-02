@@ -15,7 +15,7 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            font-family: 'Comic Sans MS', 'Comic Sans', Arial, Helvetica, sans-serif;
         }
         #game {
             width: 100vw;
@@ -70,7 +70,7 @@ class StartScene extends Phaser.Scene {
         // Create circular start button
         const startButton = this.add.circle(width/2, height/2, buttonRadius, 0x4CAF50);
         const buttonText = this.add.text(width/2, height/2, 'START', {
-            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
             fontSize: '32px',
             color: '#ffffff'
         }).setOrigin(0.5);
@@ -155,7 +155,7 @@ class PlayScene extends Phaser.Scene {
         const startY = height * 0.2;
         // Dynamically calculate block widths based on text
         let blockWidths = [];
-        let tempText = this.add.text(0, 0, '', { fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif', fontSize: '20px', fontStyle: 'bold' });
+        let tempText = this.add.text(0, 0, '', { fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif', fontSize: '20px', fontStyle: 'bold' });
         shuffledChunks.forEach(chunk => {
             tempText.setText(chunk);
             blockWidths.push(Math.max(48, tempText.width + 32)); // 32px padding, min width 48
@@ -191,7 +191,7 @@ class PlayScene extends Phaser.Scene {
             const block = this.add.rectangle(currentX + blockWidth/2, currentY + blockHeight/2, blockWidth, blockHeight, color)
                 .setStrokeStyle(3, 0xffffff);
             const text = this.add.text(currentX + blockWidth/2, currentY + blockHeight/2, chunk, {
-                fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+                fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
                 fontSize: '20px',
                 color: '#222',
                 fontStyle: 'bold'
@@ -291,25 +291,25 @@ class EndScene extends Phaser.Scene {
         const lineHeight = 30;
         // Display summary
         this.add.text(width/2, yPos, 'Game Over!', {
-            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
             fontSize: '32px',
             color: '#ffffff'
         }).setOrigin(0.5);
         yPos += 60;
         this.add.text(width/2, yPos, `Correct: ${gameState.score.correct}`, {
-            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
             fontSize: '24px',
             color: '#4CAF50'
         }).setOrigin(0.5);
         yPos += lineHeight;
         this.add.text(width/2, yPos, `Wrong: ${gameState.score.wrong}`, {
-            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
             fontSize: '24px',
             color: '#f44336'
         }).setOrigin(0.5);
         yPos += lineHeight;
         this.add.text(width/2, yPos, `Skipped: ${gameState.score.skipped}`, {
-            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
             fontSize: '24px',
             color: '#ff9800'
         }).setOrigin(0.5);
@@ -317,7 +317,7 @@ class EndScene extends Phaser.Scene {
         // Display lists
         if (gameState.results.correct.length > 0) {
             this.add.text(20, yPos, 'Correct Answers:', {
-                fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+                fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
                 fontSize: '20px',
                 color: '#4CAF50'
             });
@@ -325,7 +325,7 @@ class EndScene extends Phaser.Scene {
             gameState.results.correct.forEach(sentence => {
                 let pretty = sentence.replace(/,/g, ' ').trim() + '.';
                 this.add.text(40, yPos, pretty, {
-                    fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+                    fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
                     fontSize: '16px',
                     color: '#ffffff'
                 });
@@ -335,7 +335,7 @@ class EndScene extends Phaser.Scene {
         }
         if (gameState.results.wrong.length > 0) {
             this.add.text(20, yPos, 'Wrong Answers:', {
-                fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+                fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
                 fontSize: '20px',
                 color: '#f44336'
             });
@@ -344,13 +344,13 @@ class EndScene extends Phaser.Scene {
                 let userPretty = result.user.replace(/,/g, ' ').trim() + '.';
                 let correctPretty = result.correct.replace(/,/g, ' ').trim() + '.';
                 this.add.text(40, yPos, `Your answer: ${userPretty}`, {
-                    fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+                    fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
                     fontSize: '16px',
                     color: '#ffffff'
                 });
                 yPos += lineHeight;
                 this.add.text(40, yPos, `Correct: ${correctPretty}`, {
-                    fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+                    fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
                     fontSize: '16px',
                     color: '#4CAF50'
                 });
@@ -360,7 +360,7 @@ class EndScene extends Phaser.Scene {
         }
         if (gameState.results.skipped.length > 0) {
             this.add.text(20, yPos, 'Skipped Questions:', {
-                fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+                fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
                 fontSize: '20px',
                 color: '#ff9800'
             });
@@ -368,7 +368,7 @@ class EndScene extends Phaser.Scene {
             gameState.results.skipped.forEach(sentence => {
                 let pretty = sentence.replace(/,/g, ' ').trim() + '.';
                 this.add.text(40, yPos, pretty, {
-                    fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+                    fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
                     fontSize: '16px',
                     color: '#ffffff'
                 });
@@ -378,7 +378,7 @@ class EndScene extends Phaser.Scene {
         // Add replay button
         const replayButton = this.add.rectangle(width/2, height - 60, 200, 50, 0x4CAF50);
         this.add.text(width/2, height - 60, 'Play Again', {
-            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
             fontSize: '24px',
             color: '#ffffff'
         }).setOrigin(0.5);
