@@ -15,6 +15,7 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
         }
         #game {
             width: 100vw;
@@ -69,6 +70,7 @@ class StartScene extends Phaser.Scene {
         // Create circular start button
         const startButton = this.add.circle(width/2, height/2, buttonRadius, 0x4CAF50);
         const buttonText = this.add.text(width/2, height/2, 'START', {
+            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
             fontSize: '32px',
             color: '#ffffff'
         }).setOrigin(0.5);
@@ -90,6 +92,7 @@ class PlayScene extends Phaser.Scene {
     constructor() {
         super({ key: 'PlayScene' });
         this.blocks = [];
+        this.previousBlocks = [];
         this.dropZone = null;
         this.progressBar = null;
         this.submitButton = null;
@@ -111,6 +114,8 @@ class PlayScene extends Phaser.Scene {
         // Create answer area
         this.dropZone = this.add.rectangle(width/2, height * 0.6, width * 0.8, height * 0.2, 0x666666)
             .setStrokeStyle(2, 0xffffff);
+        // For hit test
+        this.dropZoneRect = null;
 
         // Create submit button
         this.submitButton = this.add.rectangle(width/2, height * 0.8, 200, 50, 0x4CAF50);
@@ -128,57 +133,83 @@ class PlayScene extends Phaser.Scene {
             this.scene.start('EndScene');
             return;
         }
-
-        // Clear previous blocks
-        this.blocks.forEach(block => block.destroy());
+        // Remove previous blocks and their text
+        if (this.blocks && this.blocks.length > 0) {
+            this.blocks.forEach(block => {
+                if (block.text) block.text.destroy();
+                block.destroy();
+            });
+        }
         this.blocks = [];
-
         // Select random unused sentence
         const availableSentences = gameState.sentences.filter(s => !gameState.usedSentences.has(s));
         gameState.currentSentence = Phaser.Math.RND.pick(availableSentences);
         gameState.usedSentences.add(gameState.currentSentence);
-
         // Create word blocks
         const chunks = gameState.currentSentence.split(',');
         const shuffledChunks = Phaser.Utils.Array.Shuffle([...chunks]);
-
         // Calculate block layout
         const { width, height } = this.cameras.main;
-        const blockWidth = 150;
-        const blockHeight = 40;
-        const padding = 10;
+        const blockHeight = 48;
+        const padding = 20;
         const startY = height * 0.2;
-        let currentX = (width - Math.min(chunks.length, Math.floor(width / (blockWidth + padding))) * (blockWidth + padding)) / 2;
+        // Dynamically calculate block widths based on text
+        let blockWidths = [];
+        let tempText = this.add.text(0, 0, '', { fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif', fontSize: '20px', fontStyle: 'bold' });
+        shuffledChunks.forEach(chunk => {
+            tempText.setText(chunk);
+            blockWidths.push(Math.max(48, tempText.width + 32)); // 32px padding, min width 48
+        });
+        tempText.destroy();
+        // Layout: try to fit as many as possible per row
+        let maxPerRow = shuffledChunks.length;
+        let rows = 1;
+        let tryPerRow = shuffledChunks.length;
+        while (tryPerRow > 1) {
+            let rowWidth = blockWidths.slice(0, tryPerRow).reduce((a, b) => a + b, 0) + (tryPerRow - 1) * padding;
+            if (rowWidth <= width * 0.95) { maxPerRow = tryPerRow; break; }
+            tryPerRow--;
+        }
+        let currentX = (width - (blockWidths.slice(0, maxPerRow).reduce((a, b) => a + b, 0) + (maxPerRow - 1) * padding)) / 2;
         let currentY = startY;
-
+        let blockIdx = 0;
         shuffledChunks.forEach((chunk, i) => {
-            if (currentX + blockWidth > width - padding) {
-                currentX = (width - Math.min(chunks.length, Math.floor(width / (blockWidth + padding))) * (blockWidth + padding)) / 2;
+            if (i > 0 && i % maxPerRow === 0) {
+                currentX = (width - (blockWidths.slice(i, i + maxPerRow).reduce((a, b) => a + b, 0) + (Math.min(maxPerRow, shuffledChunks.length - i) - 1) * padding)) / 2;
                 currentY += blockHeight + padding;
+                blockIdx = 0;
             }
-
-            const block = this.add.rectangle(currentX + blockWidth/2, currentY + blockHeight/2, blockWidth, blockHeight, 0x3498db);
+            // Milky rainbow color
+            const hue = Phaser.Math.Between(0, 359);
+            const pastel = Phaser.Display.Color.HSVColorWheel()[hue];
+            const color = Phaser.Display.Color.GetColor(
+                Math.floor((pastel.r + 255) / 2),
+                Math.floor((pastel.g + 255) / 2),
+                Math.floor((pastel.b + 255) / 2)
+            );
+            const blockWidth = blockWidths[i];
+            const block = this.add.rectangle(currentX + blockWidth/2, currentY + blockHeight/2, blockWidth, blockHeight, color)
+                .setStrokeStyle(3, 0xffffff);
             const text = this.add.text(currentX + blockWidth/2, currentY + blockHeight/2, chunk, {
-                fontSize: '16px',
-                color: '#ffffff'
+                fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
+                fontSize: '20px',
+                color: '#222',
+                fontStyle: 'bold'
             }).setOrigin(0.5);
-
             block.setInteractive();
             this.input.setDraggable(block);
             block.text = text;
             block.originalX = block.x;
             block.originalY = block.y;
             block.value = chunk;
-
             this.blocks.push(block);
             currentX += blockWidth + padding;
+            blockIdx++;
         });
-
         // Update progress bar
         const progress = gameState.questionNumber / gameState.maxQuestions;
         this.progressBar.width = progress * this.cameras.main.width * 0.8;
         gameState.questionNumber++;
-
         // Setup drag events
         this.setupDragEvents();
     }
@@ -210,6 +241,8 @@ class PlayScene extends Phaser.Scene {
     }
 
     isInDropZone(block) {
+        // Use the dropZone's geometry for hit test
+        if (!this.dropZone) return false;
         return Phaser.Geom.Rectangle.Contains(
             new Phaser.Geom.Rectangle(
                 this.dropZone.x - this.dropZone.width/2,
@@ -252,46 +285,47 @@ class EndScene extends Phaser.Scene {
     constructor() {
         super({ key: 'EndScene' });
     }
-
     create() {
         const { width, height } = this.cameras.main;
         let yPos = 50;
         const lineHeight = 30;
-
         // Display summary
         this.add.text(width/2, yPos, 'Game Over!', {
+            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
             fontSize: '32px',
             color: '#ffffff'
         }).setOrigin(0.5);
         yPos += 60;
-
         this.add.text(width/2, yPos, `Correct: ${gameState.score.correct}`, {
+            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
             fontSize: '24px',
             color: '#4CAF50'
         }).setOrigin(0.5);
         yPos += lineHeight;
-
         this.add.text(width/2, yPos, `Wrong: ${gameState.score.wrong}`, {
+            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
             fontSize: '24px',
             color: '#f44336'
         }).setOrigin(0.5);
         yPos += lineHeight;
-
         this.add.text(width/2, yPos, `Skipped: ${gameState.score.skipped}`, {
+            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
             fontSize: '24px',
             color: '#ff9800'
         }).setOrigin(0.5);
         yPos += lineHeight * 2;
-
         // Display lists
         if (gameState.results.correct.length > 0) {
             this.add.text(20, yPos, 'Correct Answers:', {
+                fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
                 fontSize: '20px',
                 color: '#4CAF50'
             });
             yPos += lineHeight;
             gameState.results.correct.forEach(sentence => {
-                this.add.text(40, yPos, sentence, {
+                let pretty = sentence.replace(/,/g, ' ').trim() + '.';
+                this.add.text(40, yPos, pretty, {
+                    fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
                     fontSize: '16px',
                     color: '#ffffff'
                 });
@@ -299,20 +333,24 @@ class EndScene extends Phaser.Scene {
             });
             yPos += lineHeight;
         }
-
         if (gameState.results.wrong.length > 0) {
             this.add.text(20, yPos, 'Wrong Answers:', {
+                fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
                 fontSize: '20px',
                 color: '#f44336'
             });
             yPos += lineHeight;
             gameState.results.wrong.forEach(result => {
-                this.add.text(40, yPos, `Your answer: ${result.user}`, {
+                let userPretty = result.user.replace(/,/g, ' ').trim() + '.';
+                let correctPretty = result.correct.replace(/,/g, ' ').trim() + '.';
+                this.add.text(40, yPos, `Your answer: ${userPretty}`, {
+                    fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
                     fontSize: '16px',
                     color: '#ffffff'
                 });
                 yPos += lineHeight;
-                this.add.text(40, yPos, `Correct: ${result.correct}`, {
+                this.add.text(40, yPos, `Correct: ${correctPretty}`, {
+                    fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
                     fontSize: '16px',
                     color: '#4CAF50'
                 });
@@ -320,29 +358,30 @@ class EndScene extends Phaser.Scene {
             });
             yPos += lineHeight;
         }
-
         if (gameState.results.skipped.length > 0) {
             this.add.text(20, yPos, 'Skipped Questions:', {
+                fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
                 fontSize: '20px',
                 color: '#ff9800'
             });
             yPos += lineHeight;
             gameState.results.skipped.forEach(sentence => {
-                this.add.text(40, yPos, sentence, {
+                let pretty = sentence.replace(/,/g, ' ').trim() + '.';
+                this.add.text(40, yPos, pretty, {
+                    fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
                     fontSize: '16px',
                     color: '#ffffff'
                 });
                 yPos += lineHeight;
             });
         }
-
         // Add replay button
         const replayButton = this.add.rectangle(width/2, height - 60, 200, 50, 0x4CAF50);
         this.add.text(width/2, height - 60, 'Play Again', {
+            fontFamily: 'Comic Sans MS, Comic Sans, cursive, sans-serif',
             fontSize: '24px',
             color: '#ffffff'
         }).setOrigin(0.5);
-
         replayButton.setInteractive();
         replayButton.on('pointerdown', () => {
             this.scene.start('StartScene');
