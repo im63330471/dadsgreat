@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Unscramble Sentences</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #game {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+<div id="game"></div>
+<script>
+// Game data
+const questionBank = "I,love,you,so much.You,said,I do.Let's,discuss about,the future.May,the force,be,with you.The movie,is,so boring.Drop,the zero,and,get,a hero.";
+
+// Game state
+let gameState = {
+    sentences: [],
+    usedSentences: new Set(),
+    currentSentence: null,
+    score: {
+        correct: 0,
+        wrong: 0,
+        skipped: 0
+    },
+    results: {
+        correct: [],
+        wrong: [],
+        skipped: []
+    },
+    questionNumber: 0,
+    maxQuestions: 5
+};
+
+// Start Scene
+class StartScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'StartScene' });
+    }
+
+    create() {
+        // Reset game state
+        gameState.usedSentences.clear();
+        gameState.score = { correct: 0, wrong: 0, skipped: 0 };
+        gameState.results = { correct: [], wrong: [], skipped: [] };
+        gameState.questionNumber = 0;
+
+        // Parse sentences from question bank
+        gameState.sentences = questionBank.split('.').filter(s => s.trim()).map(s => s.trim());
+
+        const { width, height } = this.cameras.main;
+        const buttonRadius = height * 0.15; // 30% diameter = 15% radius
+
+        // Create circular start button
+        const startButton = this.add.circle(width/2, height/2, buttonRadius, 0x4CAF50);
+        const buttonText = this.add.text(width/2, height/2, 'START', {
+            fontSize: '32px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+
+        // Make button interactive
+        startButton.setInteractive();
+        startButton.on('pointerdown', () => {
+            this.scene.start('PlayScene');
+        });
+
+        // Add hover effect
+        startButton.on('pointerover', () => startButton.setFillStyle(0x66BB6A));
+        startButton.on('pointerout', () => startButton.setFillStyle(0x4CAF50));
+    }
+}
+
+// Play Scene
+class PlayScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'PlayScene' });
+        this.blocks = [];
+        this.dropZone = null;
+        this.progressBar = null;
+        this.submitButton = null;
+    }
+
+    create() {
+        this.setupLayout();
+        this.loadNextQuestion();
+    }
+
+    setupLayout() {
+        const { width, height } = this.cameras.main;
+
+        // Create progress bar background
+        this.add.rectangle(width/2, 30, width * 0.8, 20, 0x333333);
+        this.progressBar = this.add.rectangle(width/2 - width * 0.4, 30, 0, 20, 0x4CAF50)
+            .setOrigin(0, 0.5);
+
+        // Create answer area
+        this.dropZone = this.add.rectangle(width/2, height * 0.6, width * 0.8, height * 0.2, 0x666666)
+            .setStrokeStyle(2, 0xffffff);
+
+        // Create submit button
+        this.submitButton = this.add.rectangle(width/2, height * 0.8, 200, 50, 0x4CAF50);
+        const submitText = this.add.text(width/2, height * 0.8, 'Submit', {
+            fontSize: '24px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+
+        this.submitButton.setInteractive();
+        this.submitButton.on('pointerdown', () => this.checkAnswer());
+    }
+
+    loadNextQuestion() {
+        if (gameState.questionNumber >= gameState.maxQuestions) {
+            this.scene.start('EndScene');
+            return;
+        }
+
+        // Clear previous blocks
+        this.blocks.forEach(block => block.destroy());
+        this.blocks = [];
+
+        // Select random unused sentence
+        const availableSentences = gameState.sentences.filter(s => !gameState.usedSentences.has(s));
+        gameState.currentSentence = Phaser.Math.RND.pick(availableSentences);
+        gameState.usedSentences.add(gameState.currentSentence);
+
+        // Create word blocks
+        const chunks = gameState.currentSentence.split(',');
+        const shuffledChunks = Phaser.Utils.Array.Shuffle([...chunks]);
+
+        // Calculate block layout
+        const { width, height } = this.cameras.main;
+        const blockWidth = 150;
+        const blockHeight = 40;
+        const padding = 10;
+        const startY = height * 0.2;
+        let currentX = (width - Math.min(chunks.length, Math.floor(width / (blockWidth + padding))) * (blockWidth + padding)) / 2;
+        let currentY = startY;
+
+        shuffledChunks.forEach((chunk, i) => {
+            if (currentX + blockWidth > width - padding) {
+                currentX = (width - Math.min(chunks.length, Math.floor(width / (blockWidth + padding))) * (blockWidth + padding)) / 2;
+                currentY += blockHeight + padding;
+            }
+
+            const block = this.add.rectangle(currentX + blockWidth/2, currentY + blockHeight/2, blockWidth, blockHeight, 0x3498db);
+            const text = this.add.text(currentX + blockWidth/2, currentY + blockHeight/2, chunk, {
+                fontSize: '16px',
+                color: '#ffffff'
+            }).setOrigin(0.5);
+
+            block.setInteractive();
+            this.input.setDraggable(block);
+            block.text = text;
+            block.originalX = block.x;
+            block.originalY = block.y;
+            block.value = chunk;
+
+            this.blocks.push(block);
+            currentX += blockWidth + padding;
+        });
+
+        // Update progress bar
+        const progress = gameState.questionNumber / gameState.maxQuestions;
+        this.progressBar.width = progress * this.cameras.main.width * 0.8;
+        gameState.questionNumber++;
+
+        // Setup drag events
+        this.setupDragEvents();
+    }
+
+    setupDragEvents() {
+        this.input.on('dragstart', (pointer, block) => {
+            block.setStrokeStyle(2, 0xffff00);
+            block.text.setDepth(1);
+        });
+
+        this.input.on('drag', (pointer, block, dragX, dragY) => {
+            block.x = dragX;
+            block.y = dragY;
+            block.text.x = dragX;
+            block.text.y = dragY;
+        });
+
+        this.input.on('dragend', (pointer, block) => {
+            block.setStrokeStyle(0);
+            if (this.isInDropZone(block)) {
+                block.setStrokeStyle(2, 0x00ff00);
+            } else {
+                block.x = block.originalX;
+                block.y = block.originalY;
+                block.text.x = block.originalX;
+                block.text.y = block.originalY;
+            }
+        });
+    }
+
+    isInDropZone(block) {
+        return Phaser.Geom.Rectangle.Contains(
+            new Phaser.Geom.Rectangle(
+                this.dropZone.x - this.dropZone.width/2,
+                this.dropZone.y - this.dropZone.height/2,
+                this.dropZone.width,
+                this.dropZone.height
+            ),
+            block.x,
+            block.y
+        );
+    }
+
+    checkAnswer() {
+        const droppedBlocks = this.blocks.filter(block => this.isInDropZone(block))
+            .sort((a, b) => a.x - b.x);
+        
+        const answer = droppedBlocks.map(block => block.value).join(',');
+        const isCorrect = answer === gameState.currentSentence;
+
+        if (droppedBlocks.length === 0) {
+            gameState.score.skipped++;
+            gameState.results.skipped.push(gameState.currentSentence);
+        } else if (isCorrect) {
+            gameState.score.correct++;
+            gameState.results.correct.push(gameState.currentSentence);
+        } else {
+            gameState.score.wrong++;
+            gameState.results.wrong.push({
+                user: answer,
+                correct: gameState.currentSentence
+            });
+        }
+
+        this.loadNextQuestion();
+    }
+}
+
+// End Scene
+class EndScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'EndScene' });
+    }
+
+    create() {
+        const { width, height } = this.cameras.main;
+        let yPos = 50;
+        const lineHeight = 30;
+
+        // Display summary
+        this.add.text(width/2, yPos, 'Game Over!', {
+            fontSize: '32px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+        yPos += 60;
+
+        this.add.text(width/2, yPos, `Correct: ${gameState.score.correct}`, {
+            fontSize: '24px',
+            color: '#4CAF50'
+        }).setOrigin(0.5);
+        yPos += lineHeight;
+
+        this.add.text(width/2, yPos, `Wrong: ${gameState.score.wrong}`, {
+            fontSize: '24px',
+            color: '#f44336'
+        }).setOrigin(0.5);
+        yPos += lineHeight;
+
+        this.add.text(width/2, yPos, `Skipped: ${gameState.score.skipped}`, {
+            fontSize: '24px',
+            color: '#ff9800'
+        }).setOrigin(0.5);
+        yPos += lineHeight * 2;
+
+        // Display lists
+        if (gameState.results.correct.length > 0) {
+            this.add.text(20, yPos, 'Correct Answers:', {
+                fontSize: '20px',
+                color: '#4CAF50'
+            });
+            yPos += lineHeight;
+            gameState.results.correct.forEach(sentence => {
+                this.add.text(40, yPos, sentence, {
+                    fontSize: '16px',
+                    color: '#ffffff'
+                });
+                yPos += lineHeight;
+            });
+            yPos += lineHeight;
+        }
+
+        if (gameState.results.wrong.length > 0) {
+            this.add.text(20, yPos, 'Wrong Answers:', {
+                fontSize: '20px',
+                color: '#f44336'
+            });
+            yPos += lineHeight;
+            gameState.results.wrong.forEach(result => {
+                this.add.text(40, yPos, `Your answer: ${result.user}`, {
+                    fontSize: '16px',
+                    color: '#ffffff'
+                });
+                yPos += lineHeight;
+                this.add.text(40, yPos, `Correct: ${result.correct}`, {
+                    fontSize: '16px',
+                    color: '#4CAF50'
+                });
+                yPos += lineHeight;
+            });
+            yPos += lineHeight;
+        }
+
+        if (gameState.results.skipped.length > 0) {
+            this.add.text(20, yPos, 'Skipped Questions:', {
+                fontSize: '20px',
+                color: '#ff9800'
+            });
+            yPos += lineHeight;
+            gameState.results.skipped.forEach(sentence => {
+                this.add.text(40, yPos, sentence, {
+                    fontSize: '16px',
+                    color: '#ffffff'
+                });
+                yPos += lineHeight;
+            });
+        }
+
+        // Add replay button
+        const replayButton = this.add.rectangle(width/2, height - 60, 200, 50, 0x4CAF50);
+        this.add.text(width/2, height - 60, 'Play Again', {
+            fontSize: '24px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+
+        replayButton.setInteractive();
+        replayButton.on('pointerdown', () => {
+            this.scene.start('StartScene');
+        });
+    }
+}
+
+// Configure and start game
+const config = {
+    type: Phaser.AUTO,
+    parent: 'game',
+    width: window.innerWidth,
+    height: window.innerHeight,
+    backgroundColor: '#222222',
+    scene: [StartScene, PlayScene, EndScene],
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    }
+};
+
+const game = new Phaser.Game(config);
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
