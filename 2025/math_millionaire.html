@@ -11,6 +11,10 @@
             font-family: 'Comic Sans MS', cursive, sans-serif;
             min-height: 100vh;
             margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         .main-container {
             display: flex;
@@ -18,47 +22,42 @@
             align-items: center;
             width: 100vw;
             min-height: 100vh;
-        }
-        .title {
-            font-size: 2.2rem;
-            color: #1976d2;
-            margin-top: 2rem;
-            margin-bottom: 1.5rem;
-            font-weight: bold;
-            letter-spacing: 2px;
+            justify-content: center;
         }
         .game-area {
             display: flex;
             flex-direction: row;
             justify-content: center;
             width: 100%;
-            max-width: 900px;
+            max-width: 700px;
         }
         .quiz-container {
             background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-            padding: 2rem 2rem 2rem 2rem;
-            margin: 0 2rem 2rem 0;
-            width: 350px;
-            min-height: 350px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+            margin: 0 1.5rem 1.5rem 0;
+            width: 270px;
+            min-height: 220px;
             text-align: left;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
         }
         .question {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            color: #2a4d69;
+            font-size: 2.2rem;
+            margin-bottom: 1.2rem;
+            color: #1976d2;
+            text-align: center;
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
         }
         .answers button {
             display: block;
             width: 100%;
-            margin: 0.5rem 0;
-            padding: 0.7rem;
-            font-size: 1rem;
-            border-radius: 10px;
+            margin: 0.4rem 0;
+            padding: 0.6rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
             border: none;
             background: #4fc3f7;
             color: #fff;
@@ -68,23 +67,19 @@
         .answers button:hover {
             background: #1976d2;
         }
-        .score {
-            margin-top: 1rem;
-            font-size: 1.1rem;
-            color: #388e3c;
-        }
         .result {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: #d84315;
-            margin-top: 1.5rem;
+            margin-top: 1.2rem;
+            text-align: center;
         }
         .restart {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             background: #ffb300;
             color: #fff;
             border: none;
-            padding: 0.7rem 1.5rem;
-            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
             font-size: 1rem;
             cursor: pointer;
         }
@@ -93,22 +88,15 @@
         }
         .ladder-container {
             background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-            padding: 2rem 1.5rem;
-            margin: 0 0 2rem 2rem;
-            width: 200px;
-            min-height: 350px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 1.5rem 1.2rem;
+            margin: 0 0 1.5rem 1.5rem;
+            width: 140px;
+            min-height: 220px;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-        }
-        .ladder-title {
-            font-size: 1.2rem;
-            color: #1976d2;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            text-align: center;
         }
         .ladder {
             list-style: none;
@@ -116,15 +104,13 @@
             margin: 0;
         }
         .ladder li {
-            font-size: 1rem;
-            padding: 0.4rem 0.7rem;
-            margin: 0.1rem 0;
-            border-radius: 8px;
+            font-size: 1.1rem;
+            padding: 0.3rem 0.5rem;
+            margin: 0.08rem 0;
+            border-radius: 6px;
             background: #e3f2fd;
             color: #1976d2;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: right;
         }
         .ladder li.current {
             background: #ffd600;
@@ -140,135 +126,309 @@
             .quiz-container, .ladder-container {
                 margin: 1rem 0;
                 width: 90%;
-                max-width: 400px;
+                max-width: 350px;
             }
         }
     </style>
 </head>
 <body>
     <div class="main-container">
-        <div class="title">Math Millionaire!</div>
-        <div class="game-area">
+        <div id="start-screen" style="width:100vw; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <div style="font-size:2.5rem; color:#1976d2; font-weight:bold; margin-bottom:2rem; letter-spacing:2px;">MATH MILLIONAIRE</div>
+            <form id="type-form" style="background:#fff; border-radius:16px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:2rem 2.5rem; display:flex; flex-direction:column; align-items:center;">
+                <div style="font-size:1.2rem; margin-bottom:1rem;">Choose question types:</div>
+                <div id="checkbox-area" style="display:flex; flex-direction:column; align-items:flex-start; margin-bottom:2rem;"></div>
+                <button type="submit" style="font-size:1.2rem; background:#4fc3f7; color:#fff; border:none; border-radius:8px; padding:0.7rem 2.5rem; cursor:pointer;">Start</button>
+            </form>
+        </div>
+        <div class="game-area" id="game-area" style="display:none;">
             <div class="quiz-container">
                 <div class="question" id="question"></div>
                 <div class="answers" id="answers"></div>
-                <div class="score" id="score"></div>
                 <div class="result" id="result"></div>
                 <button class="restart" id="restart" style="display:none;">Restart</button>
             </div>
             <div class="ladder-container">
-                <div class="ladder-title">Prize Ladder</div>
                 <ul class="ladder" id="ladder"></ul>
             </div>
         </div>
     </div>
     <script>
+        const questionTypes = [
+            "Total is 5, one of the number is between 1-4, ask another number",
+            "Total is 10, one of the number is between 1-9, ask another number",
+            "Two numbers, total is between 6-10, ask total",
+            "Two numbers, total is between 11-20, ask total",
+            "Total is 20, one of the number is between 1-19, ask another number",
+            "Total is between 11-15, one of the number is between 1-9, ask another number",
+            "Total is between 16-20, one of the number is between 6-14, ask another number",
+            "First number is between 11-15, second number is between 2-6, ask the difference",
+            "First number is between 16-20, second number is between 7-11, ask the difference",
+            "First number is between 11-15, difference is between 2-6, ask second number",
+            "First number is between 16-20, difference is between 7-11, ask second number"
+        ];
+        const questionLabels = [
+            "加埋等如 5",
+            "加埋等如 10",
+            "加數 (6-10)",
+            "加數 (11-20)",
+            "加埋等如 20",
+            "1-9 加什麼等如 11-15",
+            "6-14 加什麼等如 16-20",
+            "11-15 減 2-6",
+            "16-20 減 7-11",
+            "11-15 減什麼等如 2-6",
+            "16-20 減什麼等如 7-11"
+        ];
         // Prize ladder
         const prizeLadder = [
-            1000, 2000, 3000, 4000, 5000,
-            10000, 20000, 30000, 40000, 50000,
-            60000, 125000, 250000, 500000, 1000000
+            1000, 2000, 3000, 4000, 6000,
+            10000, 20000, 30000, 40000, 60000,
+            80000, 150000, 250000, 500000, 1000000
         ];
 
-        // Generate questions
-        function generateQuestions() {
-            const questions = [];
-            // 1-5: two numbers, total 6-10, ask total
-            for (let i = 0; i < 5; i++) {
-                const total = Math.floor(Math.random() * 5) + 6; // 6-10
-                const a = Math.floor(Math.random() * (total - 1)) + 1;
-                const b = total - a;
-                // Place correct answer randomly
-                const correctIdx = Math.floor(Math.random() * 4);
-                const answers = [];
-                for (let j = 0; j < 4; j++) {
-                    if (j === correctIdx) {
-                        answers.push(total.toString());
+        // Generate question by type
+        function generateQuestionByType(typeIdx) {
+            switch(typeIdx) {
+                case 0: {
+                    // Total is 5, one number 1-4, ask another number (randomly ask for first or second)
+                    const a = Math.floor(Math.random()*4)+1;
+                    const b = 5 - a;
+                    if (Math.random() < 0.5) {
+                        // ask for first
+                        const shuf = shuffleAnswers([a, ...uniqueRandoms(1,4,3,a)], a);
+                        return {
+                            question: `? + ${b} = 5`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
                     } else {
-                        let wrong;
-                        do {
-                            wrong = (Math.floor(Math.random() * 5) + 6).toString();
-                        } while (wrong === total.toString() || answers.includes(wrong));
-                        answers.push(wrong);
+                        // ask for second
+                        const shuf = shuffleAnswers([b, ...uniqueRandoms(1,4,3,b)], b);
+                        return {
+                            question: `${a} + ? = 5`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
                     }
                 }
-                questions.push({
-                    question: `What is ${a} + ${b}?`,
-                    answers,
-                    correct: correctIdx
-                });
-            }
-            // 6-10: two numbers, total 11-20, ask total
-            for (let i = 0; i < 5; i++) {
-                const total = Math.floor(Math.random() * 10) + 11; // 11-20
-                const a = Math.floor(Math.random() * (total - 1)) + 1;
-                const b = total - a;
-                const correctIdx = Math.floor(Math.random() * 4);
-                const answers = [];
-                for (let j = 0; j < 4; j++) {
-                    if (j === correctIdx) {
-                        answers.push(total.toString());
+                case 1: {
+                    // Total is 10, one number 1-9, ask another number (randomly ask for first or second)
+                    const a = Math.floor(Math.random()*9)+1;
+                    const b = 10 - a;
+                    if (Math.random() < 0.5) {
+                        const shuf = shuffleAnswers([a, ...uniqueRandoms(1,9,3,a)], a);
+                        return {
+                            question: `? + ${b} = 10`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
                     } else {
-                        let wrong;
-                        do {
-                            wrong = (Math.floor(Math.random() * 10) + 11).toString();
-                        } while (wrong === total.toString() || answers.includes(wrong));
-                        answers.push(wrong);
+                        const shuf = shuffleAnswers([b, ...uniqueRandoms(1,9,3,b)], b);
+                        return {
+                            question: `${a} + ? = 10`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
                     }
                 }
-                questions.push({
-                    question: `What is ${a} + ${b}?`,
-                    answers,
-                    correct: correctIdx
-                });
-            }
-            // 11-15: first number 10-15, total 15-20, ask for second number
-            for (let i = 0; i < 5; i++) {
-                const total = Math.floor(Math.random() * 6) + 15; // 15-20
-                const a = Math.floor(Math.random() * 6) + 10; // 10-15
-                let b = total - a;
-                // Ensure b is positive and a < total
-                if (b <= 0) {
-                    b = 1;
-                    a = total - b;
+                case 2: {
+                    const total = Math.floor(Math.random()*5)+6;
+                    const a = Math.floor(Math.random()*(total-1))+1;
+                    const b = total - a;
+                    const shuf = shuffleAnswers([total, ...uniqueRandoms(6,10,3,total)], total);
+                    return {
+                        question: `${a} + ${b} = ?`,
+                        answers: shuf.answers,
+                        correct: shuf.correct,
+                        typeIdx: typeIdx
+                    };
                 }
-                const correctIdx = Math.floor(Math.random() * 4);
-                const answers = [];
-                for (let j = 0; j < 4; j++) {
-                    if (j === correctIdx) {
-                        answers.push(b.toString());
+                case 3: {
+                    const total = Math.floor(Math.random()*10)+11;
+                    const a = Math.floor(Math.random()*(total-1))+1;
+                    const b = total - a;
+                    const shuf = shuffleAnswers([total, ...uniqueRandoms(11,20,3,total)], total);
+                    return {
+                        question: `${a} + ${b} = ?`,
+                        answers: shuf.answers,
+                        correct: shuf.correct,
+                        typeIdx: typeIdx
+                    };
+                }
+                case 4: {
+                    const a = Math.floor(Math.random()*19)+1;
+                    const b = 20 - a;
+                    if (Math.random() < 0.5) {
+                        const shuf = shuffleAnswers([a, ...uniqueRandoms(1,19,3,a)], a);
+                        return {
+                            question: `? + ${b} = 20`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
                     } else {
-                        let wrong;
-                        do {
-                            wrong = (Math.floor(Math.random() * 6) + 1).toString();
-                        } while (wrong === b.toString() || answers.includes(wrong));
-                        answers.push(wrong);
+                        const shuf = shuffleAnswers([b, ...uniqueRandoms(1,19,3,b)], b);
+                        return {
+                            question: `${a} + ? = 20`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
                     }
                 }
-                questions.push({
-                    question: `If the total is ${total} and the first number is ${a}, what is the second number?`,
-                    answers,
-                    correct: correctIdx
-                });
+                case 5: {
+                    const total = Math.floor(Math.random()*5)+11;
+                    const a = Math.floor(Math.random()*9)+1;
+                    let b = total - a;
+                    if (b <= 0) b = 1;
+                    if (Math.random() < 0.5) {
+                        const shuf = shuffleAnswers([a, ...uniqueRandoms(1,9,3,a)], a);
+                        return {
+                            question: `? + ${b} = ${total}`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
+                    } else {
+                        const shuf = shuffleAnswers([b, ...uniqueRandoms(1,9,3,b)], b);
+                        return {
+                            question: `${a} + ? = ${total}`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
+                    }
+                }
+                case 6: {
+                    const total = Math.floor(Math.random()*5)+16;
+                    const a = Math.floor(Math.random()*9)+6;
+                    let b = total - a;
+                    if (b <= 0) b = 1;
+                    if (Math.random() < 0.5) {
+                        const shuf = shuffleAnswers([a, ...uniqueRandoms(6,14,3,a)], a);
+                        return {
+                            question: `? + ${b} = ${total}`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
+                    } else {
+                        const shuf = shuffleAnswers([b, ...uniqueRandoms(1,14,3,b)], b);
+                        return {
+                            question: `${a} + ? = ${total}`,
+                            answers: shuf.answers,
+                            correct: shuf.correct,
+                            typeIdx: typeIdx
+                        };
+                    }
+                }
+                case 7: {
+                    const a = Math.floor(Math.random()*5)+11;
+                    const b = Math.floor(Math.random()*5)+2;
+                    const diff = a - b;
+                    const shuf = shuffleAnswers([diff, ...uniqueRandoms(5,13,3,diff)], diff);
+                    return {
+                        question: `${a} - ${b} = ?`,
+                        answers: shuf.answers,
+                        correct: shuf.correct,
+                        typeIdx: typeIdx
+                    };
+                }
+                case 8: {
+                    const a = Math.floor(Math.random()*5)+16;
+                    const b = Math.floor(Math.random()*5)+7;
+                    const diff = a - b;
+                    const shuf = shuffleAnswers([diff, ...uniqueRandoms(5,13,3,diff)], diff);
+                    return {
+                        question: `${a} - ${b} = ?`,
+                        answers: shuf.answers,
+                        correct: shuf.correct,
+                        typeIdx: typeIdx
+                    };
+                }
+                case 9: {
+                    const a = Math.floor(Math.random()*5)+11;
+                    const diff = Math.floor(Math.random()*5)+2;
+                    const b = a - diff;
+                    const shuf = shuffleAnswers([b, ...uniqueRandoms(5,13,3,b)], b);
+                    return {
+                        question: `${a} - ? = ${diff}`,
+                        answers: shuf.answers,
+                        correct: shuf.correct,
+                        typeIdx: typeIdx
+                    };
+                }
+                case 10: {
+                    const a = Math.floor(Math.random()*5)+16;
+                    const diff = Math.floor(Math.random()*5)+7;
+                    const b = a - diff;
+                    const shuf = shuffleAnswers([b, ...uniqueRandoms(5,13,3,b)], b);
+                    return {
+                        question: `${a} - ? = ${diff}`,
+                        answers: shuf.answers,
+                        correct: shuf.correct,
+                        typeIdx: typeIdx
+                    };
+                }
             }
-            return questions;
         }
-
-        let questions = generateQuestions();
+        // Helper: shuffle answers and set correct index, but sort answers ascending
+        function shuffleAnswers(arr, correctValue) {
+            arr = Array.from(new Set(arr)); // remove duplicates
+            arr.sort((a, b) => a - b);
+            return {answers: arr, correct: arr.indexOf(correctValue)};
+        }
+        // Helper: get unique randoms in range, excluding a value
+        function uniqueRandoms(min, max, count, exclude) {
+            const set = new Set();
+            while (set.size < count) {
+                let n = Math.floor(Math.random() * (max - min + 1)) + min;
+                if (n !== exclude) set.add(n);
+            }
+            return Array.from(set);
+        }
+        // Render checkboxes
+        const checkboxArea = document.getElementById('checkbox-area');
+        questionLabels.forEach((label, idx) => {
+            const div = document.createElement('div');
+            div.style.marginBottom = '0.5rem';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.id = 'qtype' + idx;
+            cb.value = idx;
+            cb.style.marginRight = '0.5rem';
+            div.appendChild(cb);
+            const lab = document.createElement('label');
+            lab.htmlFor = cb.id;
+            lab.textContent = label;
+            div.appendChild(lab);
+            checkboxArea.appendChild(div);
+        });
+        // Game logic
+        let questions = [];
         let current = 0;
         let score = 0;
         const questionEl = document.getElementById('question');
         const answersEl = document.getElementById('answers');
-        const scoreEl = document.getElementById('score');
         const resultEl = document.getElementById('result');
         const restartBtn = document.getElementById('restart');
         const ladderEl = document.getElementById('ladder');
+        const startScreen = document.getElementById('start-screen');
+        const gameArea = document.getElementById('game-area');
 
         function renderLadder(currentIdx) {
             ladderEl.innerHTML = '';
             for (let i = prizeLadder.length - 1; i >= 0; i--) {
                 const li = document.createElement('li');
-                li.textContent = `${i+1}. $${prizeLadder[i].toLocaleString()}`;
+                li.textContent = `$${prizeLadder[i].toLocaleString()}`;
+                if (i === 4 || i === 9) {
+                    li.style.fontWeight = 'bold';
+                }
                 if (i === currentIdx) {
                     li.classList.add('current');
                 }
@@ -281,18 +441,86 @@
                 const q = questions[current];
                 questionEl.textContent = q.question;
                 answersEl.innerHTML = '';
+                let selectedIdx = null;
+                let finalBtn = document.getElementById('final-answer-btn');
+                if (finalBtn) finalBtn.remove();
+                // Render answer buttons
                 q.answers.forEach((ans, idx) => {
                     const btn = document.createElement('button');
                     btn.textContent = ans;
-                    btn.onclick = () => checkAnswer(idx);
+                    btn.onclick = () => {
+                        // Highlight selected
+                        Array.from(answersEl.children).forEach(b => b.style.background = '#4fc3f7');
+                        btn.style.background = '#ffd600';
+                        selectedIdx = idx;
+                        // Show Final answer button
+                        if (!document.getElementById('final-answer-btn')) {
+                            const finalBtn = document.createElement('button');
+                            finalBtn.id = 'final-answer-btn';
+                            finalBtn.textContent = 'Final answer?';
+                            finalBtn.style.marginTop = '1rem';
+                            finalBtn.style.background = '#43a047';
+                            finalBtn.style.color = '#fff';
+                            finalBtn.style.fontWeight = 'bold';
+                            finalBtn.style.borderRadius = '8px';
+                            finalBtn.style.fontSize = '1.1rem';
+                            finalBtn.onclick = () => {
+                                if (selectedIdx !== null) {
+                                    checkAnswerWithEffect(selectedIdx, btn);
+                                }
+                            };
+                            answersEl.parentNode.insertBefore(finalBtn, answersEl.nextSibling);
+                        }
+                    };
                     answersEl.appendChild(btn);
                 });
-                scoreEl.textContent = `Question ${current + 1} of ${questions.length}`;
                 resultEl.textContent = '';
                 restartBtn.style.display = 'none';
                 renderLadder(current);
+                // Show question label at bottom
+                let labelIdx = q.typeIdx !== undefined ? q.typeIdx : (typeof q.type === 'number' ? q.type : null);
+                if (labelIdx === null) labelIdx = getTypeIdxFromQuestion(q.question);
+                let label = labelIdx !== null ? questionLabels[labelIdx] : '';
+                let labelDiv = document.getElementById('question-label');
+                if (!labelDiv) {
+                    labelDiv = document.createElement('div');
+                    labelDiv.id = 'question-label';
+                    labelDiv.style.marginTop = '1.5rem';
+                    labelDiv.style.fontSize = '1.1rem';
+                    labelDiv.style.textAlign = 'center';
+                    // Set color to white for developer purpose
+                    labelDiv.style.color = '#fff';
+                    document.querySelector('.quiz-container').appendChild(labelDiv);
+                } else {
+                    labelDiv.style.color = '#fff';
+                }
+                labelDiv.textContent = label;
             } else {
                 showResult();
+            }
+        }
+
+        // Helper: flash effect for correct answer
+        function flashGreen(btn, times, cb) {
+            if (times <= 0) { btn.style.background = '#43a047'; if (cb) cb(); return; }
+            btn.style.background = times % 2 === 0 ? '#43a047' : '#ffd600';
+            setTimeout(() => flashGreen(btn, times - 1, cb), 180);
+        }
+
+        function checkAnswerWithEffect(idx, btn) {
+            // Remove Final answer button
+            let finalBtn = document.getElementById('final-answer-btn');
+            if (finalBtn) finalBtn.remove();
+            if (idx === questions[current].correct) {
+                // Flash green effect
+                flashGreen(btn, 6, () => {
+                    score++;
+                    current++;
+                    showQuestion();
+                });
+            } else {
+                btn.style.background = '#d84315';
+                setTimeout(() => showResult(), 700);
             }
         }
 
@@ -309,23 +537,71 @@
         function showResult() {
             questionEl.textContent = '';
             answersEl.innerHTML = '';
-            scoreEl.textContent = '';
             renderLadder(score - 1);
+            // Safety net logic
+            let safePrize = 0;
+            if (score > 9) safePrize = 60000;
+            else if (score > 4) safePrize = 6000;
             if (score === questions.length) {
-                resultEl.textContent = '🎉 You Win! You are a Math Millionaire! Prize: $' + prizeLadder[score-1].toLocaleString();
+                resultEl.textContent = '🎉 You Win! Prize: $' + prizeLadder[score-1].toLocaleString();
             } else if (score > 0) {
-                resultEl.textContent = `You won $${prizeLadder[score-1].toLocaleString()}! You answered ${score} out of ${questions.length} questions correctly.`;
+                let won = prizeLadder[score-1];
+                if (score < 5) won = 0;
+                else if (score < 10) won = 6000;
+                else won = 60000;
+                resultEl.textContent = `You won $${won.toLocaleString()}`;
             } else {
                 resultEl.textContent = `You won $0. Try again!`;
             }
             restartBtn.style.display = 'inline-block';
+            // Remove question label
+            let labelDiv = document.getElementById('question-label');
+            if (labelDiv) labelDiv.textContent = '';
         }
 
-        restartBtn.onclick = () => {
-            questions = generateQuestions();
+        // Avoid duplicate questions in a session
+        function generateUniqueQuestions(typeIdx, count, existingQuestions) {
+            const set = new Set(existingQuestions.map(q => q.question));
+            let tries = 0;
+            while (count > 0 && tries < 1000) {
+                const q = generateQuestionByType(typeIdx);
+                if (!set.has(q.question)) {
+                    existingQuestions.push(q);
+                    set.add(q.question);
+                    count--;
+                }
+                tries++;
+            }
+        }
+
+        document.getElementById('type-form').onsubmit = function(e) {
+            e.preventDefault();
+            const checked = Array.from(checkboxArea.querySelectorAll('input[type=checkbox]:checked')).map(cb => parseInt(cb.value));
+            if (checked.length === 0) {
+                alert('Please select at least one question type.');
+                return;
+            }
+            questions = [];
+            if (checked.length === 1) {
+                generateUniqueQuestions(checked[0], 15, questions);
+            } else if (checked.length === 2) {
+                generateUniqueQuestions(checked[0], 7, questions);
+                generateUniqueQuestions(checked[1], 8, questions);
+            } else if (checked.length === 3) {
+                generateUniqueQuestions(checked[0], 5, questions);
+                generateUniqueQuestions(checked[1], 5, questions);
+                generateUniqueQuestions(checked[2], 5, questions);
+            }
             current = 0;
             score = 0;
+            startScreen.style.display = 'none';
+            gameArea.style.display = 'flex';
             showQuestion();
+        };
+
+        restartBtn.onclick = () => {
+            startScreen.style.display = 'flex';
+            gameArea.style.display = 'none';
         };
 
         showQuestion();
