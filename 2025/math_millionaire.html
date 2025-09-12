@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Millionaire Quiz</title>
+    <title>Math Millionaire</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
         body, * {
-            font-family: 'Georgia', serif !important;
+            font-family: 'Arial', Arial, sans-serif !important;
         }
         body {
             background: #f0f8ff;
@@ -25,6 +25,7 @@
             width: 100vw;
             min-height: 100vh;
             justify-content: center;
+            background: #2d014d;
         }
         .game-area {
             display: flex;
@@ -33,8 +34,8 @@
             width: 100%;
             max-width: 700px;
         }
-        .quiz-container {
-            background: #fff;
+        .quiz-container, .ladder-container {
+            background: none;
             border-radius: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             padding: 1.5rem 1.5rem 1.5rem 1.5rem;
@@ -45,60 +46,57 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            border: 10px solid #b3e5fc;
+        }
+        .ladder-container {
+            margin: 0 0 1.5rem 1.5rem;
+            width: 140px;
+            min-height: 220px;
         }
         .question {
             font-size: 2.2rem;
             margin-bottom: 1.2rem;
-            color: #1976d2;
+            color: #fff;
             text-align: center;
-            font-family: 'Georgia', serif !important;
+            font-family: 'Arial', Arial, sans-serif !important;
+            font-weight: bold;
         }
         .answers button {
             display: block;
             width: 100%;
-            margin: 0.4rem 0;
+            margin: 0.6rem 0;
             padding: 0.6rem;
             font-size: 1.1rem;
             border-radius: 8px;
             border: none;
-            background: #4fc3f7;
-            color: #fff;
+            background: #fff;
+            color: #2d014d;
             cursor: pointer;
             transition: background 0.2s;
         }
-        .answers button:hover {
-            background: #1976d2;
+        .answers button:disabled {
+            pointer-events: none;
+            opacity: 0.95;
+            background: #fff !important;
+            color: #2d014d !important;
+            cursor: default;
+        }
+        .answers button.selected {
+            background: #ffd600 !important;
+        }
+        .answers button.correct {
+            background: #43a047 !important;
+            color: #fff !important;
+        }
+        .answers button.incorrect {
+            background: #d84315 !important;
+            color: #fff !important;
         }
         .result {
             font-size: 1.3rem;
             color: #d84315;
             margin-top: 1.2rem;
             text-align: center;
-        }
-        .restart {
-            margin-top: 1.5rem;
-            background: #ffb300;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-        .restart:hover {
-            background: #f57c00;
-        }
-        .ladder-container {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 1.5rem 1.2rem;
-            margin: 0 0 1.5rem 1.5rem;
-            width: 140px;
-            min-height: 220px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
         }
         .ladder {
             list-style: none;
@@ -108,17 +106,31 @@
         .ladder li {
             font-size: 1.1rem;
             padding: 0.3rem 0.5rem;
-            margin: 0.08rem 0;
-            border-radius: 6px;
+            margin: 0.25rem 0;
+            border-radius: 32px 6px 6px 32px / 50% 6px 6px 50%;
             background: #e3f2fd;
             color: #1976d2;
             text-align: right;
+            font-weight: normal;
+            border-left: 8px solid #fff;
+            border-right: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .ladder li.achieved {
+            background: #43a047 !important; /* achieved = green */
+            color: #fff !important;
+            border: none
         }
         .ladder li.current {
-            background: #ffd600;
-            color: #d84315;
+            background: #ffd600 !important; /* current = yellow */
+            color: #d84315 !important;
             font-weight: bold;
-            border: 2px solid #1976d2;
+            border: none
+        }
+        /* safety net and million styling: same size and bold */
+        .ladder li.safetynet, .ladder li.million {
+            font-size: 1.25rem;
+            font-weight: bold !important;
         }
         /* Remove column layout for small screens, always row */
         @media (max-width: 800px) {
@@ -132,37 +144,97 @@
                 max-width: 350px;
             }
         }
-        /* Style for Final answer button to match Start button */
-        #final-answer-btn {
-            display: block;
-            margin: 2.2rem auto 0 auto !important;
-            background: #4fc3f7;
-            color: #fff;
+        #start-screen-title {
+            color: #fff !important;
+        }
+        #type-form button[type=submit] {
+            font-size: 1.2rem;
+            background: #4fc3f7 !important;
+            color: #0a2259 !important;
             border: none;
             border-radius: 8px;
             padding: 0.7rem 2.5rem;
-            font-size: 1.2rem;
-            font-family: 'Georgia', serif !important;
-            font-weight: normal;
             cursor: pointer;
-            width: auto !important;
-            height: auto !important;
-            letter-spacing: 1px;
+            font-family: 'Arial', Arial, sans-serif !important;
+            margin-top: 1.2rem;
+            width: 50%;
+            min-width: 120px;
+            max-width: 200px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
             transition: background 0.2s;
         }
+        #type-form button[type=submit]:hover {
+            background: #1976d2 !important;
+            color: #fff !important;
+        }
+        .answers button:hover {
+            background: #ff9800 !important;
+            color: #fff !important;
+        }
+        #final-answer-btn {
+             display: block;
+             margin: 2.2rem auto 0 auto !important;
+             background: #4fc3f7 !important;
+             color: #fff !important;
+             border: none;
+             border-radius: 8px;
+             padding: 0.7rem 2.5rem;
+             font-size: 1.2rem;
+             font-family: 'Arial', Arial, sans-serif !important;
+             font-weight: normal;
+             cursor: pointer;
+             width: 75% !important; /* wider to avoid wrapping */
+             max-width: 340px; /* keep reasonable on narrow screens */
+             white-space: nowrap; /* keep text on one line */
+             height: auto !important;
+             letter-spacing: 1px;
+             transition: background 0.2s;
+         }
         #final-answer-btn:hover {
-            background: #1976d2;
+            background: #1976d2 !important;
+        }
+        .custom-next-btn, .restart {
+            margin-top: 1.2rem;
+            background: #1976d2 !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 0.7rem 2.5rem !important;
+            font-size: 1.1rem !important;
+            font-family: Arial, sans-serif !important;
+            cursor: pointer !important;
+            width: 50% !important;
+            min-width: 120px;
+            max-width: 200px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+            transition: background 0.2s;
+        }
+        /* Make Next button stand out */
+        #next-btn {
+            background: #ff9800 !important;
+            color: #0a2259 !important;
+            width: 50% !important;
+            min-width: 120px;
+        }
+        #next-btn:hover { background: #fb8c00 !important; }
+        .custom-next-btn:hover, .restart:hover {
+            background: #1565c0 !important;
         }
     </style>
 </head>
 <body>
     <div class="main-container">
         <div id="start-screen" style="width:100vw; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-            <div style="font-size:2.5rem; color:#1976d2; font-weight:bold; margin-bottom:2rem; letter-spacing:2px;">MATH MILLIONAIRE</div>
-            <form id="type-form" style="background:#fff; border-radius:16px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:2rem 2.5rem; display:flex; flex-direction:column; align-items:center;">
-                <div style="font-size:1.2rem; margin-bottom:1rem;">Choose question types:</div>
+            <div id="start-screen-title" style="font-size:2.5rem; font-weight:bold; margin-bottom:2rem; letter-spacing:2px;">MATH MILLIONAIRE</div>
+            <form id="type-form" style="border:10px solid #b3e5fc; background:transparent; border-radius:16px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:2rem 2.5rem; display:flex; flex-direction:column; align-items:center; color:#fff;">
+                <div style="font-size:1.2rem; margin-bottom:1rem; color:#fff;"><u>Choose question types:</u></div>
                 <div id="checkbox-area" style="display:flex; flex-direction:column; align-items:flex-start; margin-bottom:2rem;"></div>
-                <button type="submit" style="font-size:1.2rem; background:#4fc3f7; color:#fff; border:none; border-radius:8px; padding:0.7rem 2.5rem; cursor:pointer;">Start</button>
+                <button type="submit">Start</button>
             </form>
         </div>
         <div class="game-area" id="game-area" style="display:none;">
@@ -176,6 +248,8 @@
                 <ul class="ladder" id="ladder"></ul>
             </div>
         </div>
+        <!-- moved question type label here (below game-area) -->
+        <div id="question-type-label" style="margin-top:1rem; font-size:1.1rem; text-align:center; color:#fff; width:100%; max-width:700px;"></div>
     </div>
     <script>
         const questionTypes = [
@@ -190,19 +264,6 @@
             "First number is between 16-20, second number is between 7-11, ask the difference",
             "First number is between 11-15, difference is between 2-6, ask second number",
             "First number is between 16-20, difference is between 7-11, ask second number"
-        ];
-        const questionLabels = [
-            "加埋等如 5",
-            "加埋等如 10",
-            "加數 (6-10)",
-            "加數 (11-20)",
-            "加埋等如 20",
-            "1-9 加什麼等如 11-15",
-            "6-14 加什麼等如 16-20",
-            "11-15 減 2-6",
-            "16-20 減 7-11",
-            "11-15 減什麼等如 2-6",
-            "16-20 減什麼等如 7-11"
         ];
         // Prize ladder
         const prizeLadder = [
@@ -418,7 +479,7 @@
         }
         // Render checkboxes
         const checkboxArea = document.getElementById('checkbox-area');
-        questionLabels.forEach((label, idx) => {
+        questionTypes.forEach((label, idx) => {
             const div = document.createElement('div');
             div.style.marginBottom = '0.5rem';
             const cb = document.createElement('input');
@@ -445,15 +506,125 @@
         const startScreen = document.getElementById('start-screen');
         const gameArea = document.getElementById('game-area');
 
-        function renderLadder(currentIdx) {
+        // Add start form handler and restart behavior
+        const typeForm = document.getElementById('type-form');
+        if (typeForm) {
+            typeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const checked = Array.from(document.querySelectorAll('#checkbox-area input[type=checkbox]:checked'));
+                if (checked.length < 1 || checked.length > 3) {
+                    alert('Please select between 1 and 3 question types.');
+                    return;
+                }
+                // Build selected type indices
+                const selectedTypes = checked.map(cb => parseInt(cb.value, 10));
+                // Generate 15 questions by cycling selected types
+                questions = [];
+                const totalQuestions = 15;
+                for (let i = 0; i < totalQuestions; i++) {
+                    const typeIdx = selectedTypes[i % selectedTypes.length];
+                    const q = generateQuestionByType(typeIdx);
+                    // attach typeIdx explicitly if missing
+                    if (q && q.typeIdx === undefined) q.typeIdx = typeIdx;
+                    questions.push(q);
+                }
+                current = 0;
+                score = 0;
+                // hide start, show game
+                startScreen.style.display = 'none';
+                gameArea.style.display = 'flex';
+                // clear any lingering label
+                const typeLabelEl = document.getElementById('question-type-label');
+                if (typeLabelEl) typeLabelEl.textContent = '';
+                // render first question
+                showQuestion();
+            });
+        }
+
+        // Restart behavior: show start screen again and reset state
+        restartBtn.addEventListener('click', () => {
+            // reset state
+            questions = [];
+            current = 0;
+            score = 0;
+            // hide game, show start
+            gameArea.style.display = 'none';
+            startScreen.style.display = 'flex';
+            // cleanup UI
+            questionEl.textContent = '';
+            answersEl.innerHTML = '';
+            resultEl.textContent = '';
+            const finalBtn = document.getElementById('final-answer-btn');
+            if (finalBtn) finalBtn.remove();
+            const nextBtn = document.getElementById('next-btn');
+            if (nextBtn) nextBtn.remove();
+            renderLadder(0);
+        });
+
+        function showQuestion() {
+            if (current < questions.length) {
+                const q = questions[current];
+                questionEl.textContent = q.question;
+                answersEl.innerHTML = '';
+                let selectedIdx = null;
+                let finalBtn = document.getElementById('final-answer-btn');
+                if (finalBtn) finalBtn.remove();
+                // Render answer buttons
+                q.answers.forEach((ans, idx) => {
+                    const btn = document.createElement('button');
+                    btn.textContent = ans;
+                    btn.disabled = false; // ensure enabled
+                    btn.onclick = () => {
+                        Array.from(answersEl.children).forEach((b, i) => {
+                            b.classList.remove('selected');
+                            b.style.background = ''; // allow .selected CSS to show yellow
+                        });
+                        btn.classList.add('selected');
+                        selectedIdx = idx;
+                        if (!document.getElementById('final-answer-btn')) {
+                            const finalBtn = document.createElement('button');
+                            finalBtn.id = 'final-answer-btn';
+                            finalBtn.textContent = 'Final answer?';
+                            finalBtn.onclick = () => {
+                                if (selectedIdx !== null) {
+                                    checkAnswerWithEffect(selectedIdx, btn);
+                                }
+                            };
+                            answersEl.parentNode.insertBefore(finalBtn, answersEl.nextSibling);
+                        }
+                    };
+                    answersEl.appendChild(btn);
+                });
+                resultEl.textContent = '';
+                restartBtn.style.display = 'none';
+                let nextBtn = document.getElementById('next-btn');
+                if (nextBtn) nextBtn.remove();
+                // render ladder based on current score
+                renderLadder(score);
+                // Show question label at bottom (moved out of .quiz-container)
+                let labelIdx = q.typeIdx !== undefined ? q.typeIdx : (typeof q.type === 'number' ? q.type : null);
+                let label = labelIdx !== null ? questionTypes[labelIdx] : '';
+                const typeLabelEl = document.getElementById('question-type-label');
+                if (typeLabelEl) {
+                    typeLabelEl.textContent = label;
+                    typeLabelEl.style.color = '#fff';
+                }
+            } else {
+                showResult();
+            }
+        }
+        function renderLadder(achievedCount) {
+            // achievedCount = number of correctly answered questions (score)
             ladderEl.innerHTML = '';
             for (let i = prizeLadder.length - 1; i >= 0; i--) {
                 const li = document.createElement('li');
                 li.textContent = `$${prizeLadder[i].toLocaleString()}`;
-                if (i === 4 || i === 9) {
-                    li.style.fontWeight = 'bold';
-                }
-                if (i === currentIdx) {
+                if (i === 4 || i === 9) li.classList.add('safetynet');
+                if (i === 14) li.classList.add('million');
+                // i ranges 14..0, achieved indices are 0..achievedCount-1
+                if (i < achievedCount) {
+                    li.classList.add('achieved');
+                } else if (i === achievedCount) {
                     li.classList.add('current');
                 }
                 ladderEl.appendChild(li);
@@ -472,17 +643,18 @@
                 q.answers.forEach((ans, idx) => {
                     const btn = document.createElement('button');
                     btn.textContent = ans;
+                    btn.disabled = false; // ensure enabled
                     btn.onclick = () => {
-                        // Highlight selected
-                        Array.from(answersEl.children).forEach(b => b.style.background = '#4fc3f7');
-                        btn.style.background = '#ffd600';
+                        Array.from(answersEl.children).forEach((b, i) => {
+                            b.classList.remove('selected');
+                            b.style.background = ''; // allow .selected CSS to show yellow
+                        });
+                        btn.classList.add('selected');
                         selectedIdx = idx;
-                        // Show Final answer button
                         if (!document.getElementById('final-answer-btn')) {
                             const finalBtn = document.createElement('button');
                             finalBtn.id = 'final-answer-btn';
                             finalBtn.textContent = 'Final answer?';
-                            // Style is now in CSS
                             finalBtn.onclick = () => {
                                 if (selectedIdx !== null) {
                                     checkAnswerWithEffect(selectedIdx, btn);
@@ -495,51 +667,101 @@
                 });
                 resultEl.textContent = '';
                 restartBtn.style.display = 'none';
-                renderLadder(current);
-                // Show question label at bottom
+                let nextBtn = document.getElementById('next-btn');
+                if (nextBtn) nextBtn.remove();
+                // render ladder based on current score
+                renderLadder(score);
+                // Show question label at bottom (moved out of .quiz-container)
                 let labelIdx = q.typeIdx !== undefined ? q.typeIdx : (typeof q.type === 'number' ? q.type : null);
-                if (labelIdx === null) labelIdx = getTypeIdxFromQuestion(q.question);
-                let label = labelIdx !== null ? questionLabels[labelIdx] : '';
-                let labelDiv = document.getElementById('question-label');
-                if (!labelDiv) {
-                    labelDiv = document.createElement('div');
-                    labelDiv.id = 'question-label';
-                    labelDiv.style.marginTop = '1.5rem';
-                    labelDiv.style.fontSize = '1.1rem';
-                    labelDiv.style.textAlign = 'center';
-                    // Set color to white for developer purpose
-                    labelDiv.style.color = '#fff';
-                    document.querySelector('.quiz-container').appendChild(labelDiv);
-                } else {
-                    labelDiv.style.color = '#fff';
+                let label = labelIdx !== null ? questionTypes[labelIdx] : '';
+                const typeLabelEl2 = document.getElementById('question-type-label');
+                if (typeLabelEl2) {
+                    typeLabelEl2.textContent = label;
+                    typeLabelEl2.style.color = '#fff';
                 }
-                labelDiv.textContent = label;
             } else {
                 showResult();
             }
         }
 
-        // Helper: flash effect for correct answer
-        function flashGreen(btn, times, cb) {
-            if (times <= 0) { btn.style.background = '#43a047'; if (cb) cb(); return; }
-            btn.style.background = times % 2 === 0 ? '#43a047' : '#ffd600';
-            setTimeout(() => flashGreen(btn, times - 1, cb), 180);
+        // Helper: flash correct button green in pulses (pulses within totalMs), then call cb
+        function flashGreenPulses(btn, pulses, totalMs, cb) {
+            // Use explicit colors: green for pulse, yellow if selected, white otherwise
+            const isSelected = btn.classList.contains('selected');
+            const origBg = isSelected ? '#ffd600' : '#fff';
+            const prevTransition = btn.style.transition || '';
+            // Temporarily disable background transition so pulses are instant
+            btn.style.transition = 'none';
+            const singlePeriod = Math.floor(totalMs / pulses);
+            const onMs = Math.max(80, Math.floor(singlePeriod * 0.35)); // green on duration
+            const offMs = Math.max(50, singlePeriod - onMs);
+            let i = 0;
+            function doPulse() {
+                if (i >= pulses) {
+                    btn.style.background = '#43a047';
+                    // restore transition
+                    btn.style.transition = prevTransition;
+                    if (cb) cb();
+                    return;
+                }
+                // paint green, force repaint, then restore to selected/orig color
+                btn.style.background = '#43a047';
+                // force repaint
+                void btn.offsetWidth;
+                setTimeout(() => {
+                    btn.style.background = origBg;
+                    // force repaint
+                    void btn.offsetWidth;
+                    i++;
+                    setTimeout(doPulse, offMs);
+                }, onMs);
+            }
+            doPulse();
         }
 
         function checkAnswerWithEffect(idx, btn) {
-            // Remove Final answer button
             let finalBtn = document.getElementById('final-answer-btn');
             if (finalBtn) finalBtn.remove();
-            if (idx === questions[current].correct) {
-                // Flash green effect
-                flashGreen(btn, 6, () => {
-                    score++;
-                    current++;
-                    showQuestion();
+            const correctIdx = questions[current].correct;
+            const answerButtons = Array.from(answersEl.children);
+            // prevent interactions by removing pointer events (don't set disabled, which forces white background)
+            answerButtons.forEach((b) => {
+                b.style.pointerEvents = 'none';
+            });
+            if (idx === correctIdx) {
+                // Immediately mark ladder current as achieved
+                const liIndex = prizeLadder.length - 1 - score;
+                const currentLi = ladderEl.children[liIndex];
+                if (currentLi) {
+                    currentLi.classList.remove('current');
+                    currentLi.classList.add('achieved');
+                }
+                // ensure selected visual is present
+                btn.classList.add('selected');
+                // flash green 3 times within 1 second, then finalize
+                flashGreenPulses(btn, 3, 1000, () => {
+                    btn.classList.add('correct');
+                    // show congrat and Next button
+                    resultEl.textContent = '🎉 Correct! Well done!';
+                    let nextBtn = document.createElement('button');
+                    nextBtn.id = 'next-btn';
+                    nextBtn.textContent = 'Next';
+                    nextBtn.className = 'custom-next-btn';
+                    nextBtn.onclick = () => {
+                        score++;
+                        current++;
+                        nextBtn.remove();
+                        showQuestion();
+                    };
+                    resultEl.parentNode.insertBefore(nextBtn, resultEl.nextSibling);
                 });
             } else {
-                btn.style.background = '#d84315';
-                setTimeout(() => showResult(), 700);
+                // incorrect: mark chosen red and correct green
+                btn.classList.add('incorrect');
+                if (answerButtons[correctIdx]) answerButtons[correctIdx].classList.add('correct');
+                resultEl.textContent = 'Not quite! Try again next time!';
+                restartBtn.className = 'restart custom-next-btn';
+                restartBtn.style.display = 'inline-block';
             }
         }
 
@@ -554,76 +776,18 @@
         }
 
         function showResult() {
-            questionEl.textContent = '';
-            answersEl.innerHTML = '';
-            renderLadder(score - 1);
-            // Safety net logic
-            let safePrize = 0;
-            if (score > 9) safePrize = 60000;
-            else if (score > 4) safePrize = 6000;
-            if (score === questions.length) {
-                resultEl.textContent = '🎉 You Win! Prize: $' + prizeLadder[score-1].toLocaleString();
-            } else if (score > 0) {
-                let won = prizeLadder[score-1];
-                if (score < 5) won = 0;
-                else if (score < 10) won = 6000;
-                else won = 60000;
-                resultEl.textContent = `You won $${won.toLocaleString()}`;
-            } else {
-                resultEl.textContent = `You won $0. Try again!`;
-            }
-            restartBtn.style.display = 'inline-block';
-            // Remove question label
-            let labelDiv = document.getElementById('question-label');
-            if (labelDiv) labelDiv.textContent = '';
-        }
-
-        // Avoid duplicate questions in a session
-        function generateUniqueQuestions(typeIdx, count, existingQuestions) {
-            const set = new Set(existingQuestions.map(q => q.question));
-            let tries = 0;
-            while (count > 0 && tries < 1000) {
-                const q = generateQuestionByType(typeIdx);
-                if (!set.has(q.question)) {
-                    existingQuestions.push(q);
-                    set.add(q.question);
-                    count--;
-                }
-                tries++;
-            }
-        }
-
-        document.getElementById('type-form').onsubmit = function(e) {
-            e.preventDefault();
-            const checked = Array.from(checkboxArea.querySelectorAll('input[type=checkbox]:checked')).map(cb => parseInt(cb.value));
-            if (checked.length === 0) {
-                alert('Please select at least one question type.');
+            // If no questions generated yet (initial load), do nothing to avoid runtime errors
+            if (!questions || questions.length === 0) {
+                resultEl.textContent = '';
+                restartBtn.style.display = 'none';
                 return;
             }
-            questions = [];
-            if (checked.length === 1) {
-                generateUniqueQuestions(checked[0], 15, questions);
-            } else if (checked.length === 2) {
-                generateUniqueQuestions(checked[0], 7, questions);
-                generateUniqueQuestions(checked[1], 8, questions);
-            } else if (checked.length === 3) {
-                generateUniqueQuestions(checked[0], 5, questions);
-                generateUniqueQuestions(checked[1], 5, questions);
-                generateUniqueQuestions(checked[2], 5, questions);
-            }
-            current = 0;
-            score = 0;
-            startScreen.style.display = 'none';
-            gameArea.style.display = 'flex';
-            showQuestion();
-        };
-
-        restartBtn.onclick = () => {
-            startScreen.style.display = 'flex';
-            gameArea.style.display = 'none';
-        };
-
-        showQuestion();
+            questionEl.textContent = '';
+            answersEl.innerHTML = '';
+            renderLadder(score);
+            resultEl.innerHTML = `You reached question ${current} out of ${questions.length}.<br>Your score: $${score * 1000}`;
+            restartBtn.style.display = 'inline-block';
+        }
     </script>
 </body>
 </html>
