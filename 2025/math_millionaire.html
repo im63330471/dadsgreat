@@ -6,9 +6,11 @@
     <title>Math Millionaire Quiz</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
+        body, * {
+            font-family: 'Comic Sans MS', cursive, sans-serif !important;
+        }
         body {
             background: #f0f8ff;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -49,7 +51,7 @@
             margin-bottom: 1.2rem;
             color: #1976d2;
             text-align: center;
-            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+            font-family: 'Comic Sans MS', cursive, sans-serif !important;
         }
         .answers button {
             display: block;
@@ -118,16 +120,27 @@
             font-weight: bold;
             border: 2px solid #1976d2;
         }
+        /* Remove column layout for small screens, always row */
         @media (max-width: 800px) {
             .game-area {
-                flex-direction: column;
-                align-items: center;
+                flex-direction: row !important;
+                align-items: flex-start;
             }
             .quiz-container, .ladder-container {
-                margin: 1rem 0;
+                margin: 1rem 0.5rem;
                 width: 90%;
                 max-width: 350px;
             }
+        }
+        /* Style for Final answer button */
+        #final-answer-btn {
+            display: block;
+            margin: 2.2rem auto 0 auto !important;
+            width: 110px !important;
+            height: 60px !important;
+            font-size: 1.5rem !important;
+            font-family: 'Comic Sans MS', cursive, sans-serif !important;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -458,12 +471,7 @@
                             const finalBtn = document.createElement('button');
                             finalBtn.id = 'final-answer-btn';
                             finalBtn.textContent = 'Final answer?';
-                            finalBtn.style.marginTop = '1rem';
-                            finalBtn.style.background = '#43a047';
-                            finalBtn.style.color = '#fff';
-                            finalBtn.style.fontWeight = 'bold';
-                            finalBtn.style.borderRadius = '8px';
-                            finalBtn.style.fontSize = '1.1rem';
+                            // Style is now in CSS
                             finalBtn.onclick = () => {
                                 if (selectedIdx !== null) {
                                     checkAnswerWithEffect(selectedIdx, btn);
