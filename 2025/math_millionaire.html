@@ -498,6 +498,8 @@
         let questions = [];
         let current = 0;
         let score = 0;
+        // Handle persistent fireworks cleanup for final-win
+        let persistentFireworksCleanup = null;
         const questionEl = document.getElementById('question');
         const answersEl = document.getElementById('answers');
         const resultEl = document.getElementById('result');
@@ -518,16 +520,48 @@
                 }
                 // Build selected type indices
                 const selectedTypes = checked.map(cb => parseInt(cb.value, 10));
-                // Generate 15 questions by cycling selected types
+                // Generate 15 questions based on selected types
                 questions = [];
                 const totalQuestions = 15;
-                for (let i = 0; i < totalQuestions; i++) {
-                    const typeIdx = selectedTypes[i % selectedTypes.length];
-                    const q = generateQuestionByType(typeIdx);
-                    // attach typeIdx explicitly if missing
-                    if (q && q.typeIdx === undefined) q.typeIdx = typeIdx;
-                    questions.push(q);
+
+                if (selectedTypes.length === 1) {
+                    // All questions are of the single selected type
+                    for (let i = 0; i < totalQuestions; i++) {
+                        const q = generateQuestionByType(selectedTypes[0]);
+                        if (q && q.typeIdx === undefined) q.typeIdx = selectedTypes[0];
+                        questions.push(q);
+                    }
+                } else if (selectedTypes.length === 2) {
+                    // First 7 questions are of the first type, next 8 are of the second type
+                    for (let i = 0; i < 7; i++) {
+                        const q = generateQuestionByType(selectedTypes[0]);
+                        if (q && q.typeIdx === undefined) q.typeIdx = selectedTypes[0];
+                        questions.push(q);
+                    }
+                    for (let i = 7; i < totalQuestions; i++) {
+                        const q = generateQuestionByType(selectedTypes[1]);
+                        if (q && q.typeIdx === undefined) q.typeIdx = selectedTypes[1];
+                        questions.push(q);
+                    }
+                } else if (selectedTypes.length === 3) {
+                    // First 5 questions are of the first type, next 5 of the second, last 5 of the third
+                    for (let i = 0; i < 5; i++) {
+                        const q = generateQuestionByType(selectedTypes[0]);
+                        if (q && q.typeIdx === undefined) q.typeIdx = selectedTypes[0];
+                        questions.push(q);
+                    }
+                    for (let i = 5; i < 10; i++) {
+                        const q = generateQuestionByType(selectedTypes[1]);
+                        if (q && q.typeIdx === undefined) q.typeIdx = selectedTypes[1];
+                        questions.push(q);
+                    }
+                    for (let i = 10; i < totalQuestions; i++) {
+                        const q = generateQuestionByType(selectedTypes[2]);
+                        if (q && q.typeIdx === undefined) q.typeIdx = selectedTypes[2];
+                        questions.push(q);
+                    }
                 }
+
                 current = 0;
                 score = 0;
                 // hide start, show game
@@ -544,6 +578,13 @@
         // Restart behavior: show start screen again and reset state
         restartBtn.addEventListener('click', () => {
             // reset state
+            // cleanup persistent fireworks if any
+            try {
+                if (persistentFireworksCleanup) {
+                    persistentFireworksCleanup();
+                    persistentFireworksCleanup = null;
+                }
+            } catch (e) { /* ignore */ }
             questions = [];
             current = 0;
             score = 0;
@@ -560,6 +601,140 @@
             if (nextBtn) nextBtn.remove();
             renderLadder(0);
         });
+
+        // simple fireworks overlay (canvas) — auto-removes after duration
+        function showFireworks(duration = 2500, persist = false) {
+            const canvas = document.createElement('canvas');
+            canvas.style.position = 'fixed';
+            canvas.style.left = '0';
+            canvas.style.top = '0';
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.style.pointerEvents = 'none';
+            canvas.style.zIndex = 9999;
+            document.body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            resize();
+            window.addEventListener('resize', resize);
+
+            let particles = [];
+            function rnd(min, max) { return Math.random() * (max - min) + min; }
+            const colors = ['#ff5252','#ffea00','#69f0ae','#448aff','#ff4081','#ffb74d'];
+
+            function spawnBursts(countBursts = 4) {
+                for (let b = 0; b < countBursts; b++) {
+                    const cx = rnd(canvas.width * 0.15, canvas.width * 0.85);
+                    const cy = rnd(canvas.height * 0.1, canvas.height * 0.45);
+                    const count = 20 + Math.floor(Math.random() * 40);
+                    for (let i = 0; i < count; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = rnd(1.5, 7);
+                        particles.push({
+                            x: cx,
+                            y: cy,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            life: rnd(700, 1600),
+                            age: 0,
+                            color: colors[Math.floor(Math.random() * colors.length)],
+                            size: rnd(1.5, 3.5)
+                        });
+                    }
+                }
+            }
+
+            // initial bursts
+            spawnBursts(6);
+
+            // If persistent, keep spawning new bursts periodically until cleanup is called
+            let spawnInterval = null;
+            if (persist) {
+                spawnInterval = setInterval(() => {
+                    // spawn a few bursts to keep the effect alive
+                    spawnBursts(3);
+                }, 800 + Math.floor(Math.random() * 800));
+            }
+
+            let last = performance.now();
+            let running = true;
+            function frame(now) {
+                if (!running) return;
+                const dt = now - last; last = now;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // update and draw particles
+                for (let p of particles) {
+                    p.age += dt;
+                    if (p.age >= p.life) continue;
+                    const t = p.age / p.life;
+                    p.vy += 0.002 * dt;
+                    p.x += p.vx * dt / 16;
+                    p.y += p.vy * dt / 16;
+                    ctx.globalAlpha = Math.max(0, 1 - t);
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * (1 + t), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+                // remove dead particles to keep array small
+                particles = particles.filter(p => p.age < p.life);
+
+                // If not persistent and no particles remain, cleanup
+                if (!persist && particles.length === 0) {
+                    cleanup();
+                    return;
+                }
+                // continue animation
+                requestAnimationFrame(frame);
+            }
+
+            function cleanup() {
+                running = false;
+                window.removeEventListener('resize', resize);
+                if (spawnInterval) {
+                    clearInterval(spawnInterval);
+                    spawnInterval = null;
+                }
+                if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
+            }
+
+            requestAnimationFrame(frame);
+
+            // If not persistent, schedule a safety cleanup after duration
+            if (!persist) {
+                setTimeout(() => { try { cleanup(); } catch (e) {} }, duration + 300);
+                return cleanup;
+            }
+            // persistent: return cleanup so caller can remove when desired
+            return cleanup;
+        }
+
+        // Developer helper: click the $1,000,000 ladder entry to mark the current question correct
+        function devWinMillion() {
+            try {
+                if (!questions || current >= questions.length) return;
+                const q = questions[current];
+                const correctIdx = q.correct;
+                // try to find the visible answer button for the correct answer
+                let btn = answersEl.children[correctIdx];
+                if (!btn) btn = document.createElement('button');
+                // trigger the normal check flow (this will show fireworks, result text, etc.)
+                checkAnswerWithEffect(correctIdx, btn);
+                const isFinal = (current === questions.length - 1);
+                // If not the final question, advance automatically after a short delay
+                if (!isFinal) {
+                    setTimeout(() => {
+                        // emulate clicking Next: increase score and move on
+                        score++;
+                        current++;
+                        const nextBtn = document.getElementById('next-btn');
+                        if (nextBtn) nextBtn.remove();
+                        showQuestion();
+                    }, 600);
+                }
+            } catch (e) { /* ignore developer helper errors */ }
+        }
 
         function showQuestion() {
             if (current < questions.length) {
@@ -621,6 +796,15 @@
                 li.textContent = `$${prizeLadder[i].toLocaleString()}`;
                 if (i === 4 || i === 9) li.classList.add('safetynet');
                 if (i === 14) li.classList.add('million');
+                // Make the million item clickable for developer testing
+                if (i === 14) {
+                    li.style.cursor = 'pointer';
+                    li.title = 'DEV: Click to auto-answer current question correctly';
+                    li.addEventListener('click', (ev) => {
+                        ev.preventDefault();
+                        devWinMillion();
+                    });
+                }
                 // i ranges 14..0, achieved indices are 0..achievedCount-1
                 if (i < achievedCount) {
                     li.classList.add('achieved');
@@ -680,7 +864,13 @@
                     typeLabelEl2.style.color = '#fff';
                 }
             } else {
-                showResult();
+                // End of questions — show final summary and Restart button
+                questionEl.textContent = '';
+                answersEl.innerHTML = '';
+                renderLadder(score);
+                resultEl.innerHTML = `You reached question ${current} out of ${questions.length}.<br>Your score: $${score * 1000}`;
+                restartBtn.className = 'restart custom-next-btn';
+                restartBtn.style.display = 'inline-block';
             }
         }
 
@@ -724,10 +914,18 @@
             if (finalBtn) finalBtn.remove();
             const correctIdx = questions[current].correct;
             const answerButtons = Array.from(answersEl.children);
-            // prevent interactions by removing pointer events (don't set disabled, which forces white background)
+            // prevent interactions by removing pointer events
             answerButtons.forEach((b) => {
                 b.style.pointerEvents = 'none';
             });
+
+            // helper to compute guaranteed prize when the player fails
+            function guaranteedPrizeForScore(s) {
+                if (s >= 10) return prizeLadder[9]; // passed question 10
+                if (s >= 5) return prizeLadder[4];  // passed question 5
+                return 0;
+            }
+
             if (idx === correctIdx) {
                 // Immediately mark ladder current as achieved
                 const liIndex = prizeLadder.length - 1 - score;
@@ -738,55 +936,69 @@
                 }
                 // ensure selected visual is present
                 btn.classList.add('selected');
-                // flash green 3 times within 1 second, then finalize
-                flashGreenPulses(btn, 3, 1000, () => {
-                    btn.classList.add('correct');
-                    // show congrat and Next button
+                // turn correct answer green
+                btn.classList.add('correct');
+
+                // if this is question 5, 10 or 15 (indices 4,9,14) show fireworks
+                const isMilestone = (current === 4 || current === 9 || current === 14);
+                if (isMilestone) {
+                    try {
+                        // persist fireworks only for the final win (index 14)
+                        const cleanup = showFireworks(2500, current === 14);
+                        if (current === 14) {
+                            // store cleanup to remove on restart
+                            persistentFireworksCleanup = cleanup;
+                        }
+                    } catch (e) { /* ignore animation errors */ }
+                }
+
+                const isFinalQuestion = (current === questions.length - 1);
+                if (isFinalQuestion) {
+                    // On the final question, tell the user the prize amount
+                    const prizeAmount = prizeLadder[score].toLocaleString();
+                    resultEl.textContent = `🎉 Correct! Well done! You won $${prizeAmount}!`;
+                } else {
+                    // On non-final questions, do not show the prize amount — simple congrat
                     resultEl.textContent = '🎉 Correct! Well done!';
+                }
+
+                if (isFinalQuestion) {
+                    // Show restart button for final correct — use existing restart handler
+                    restartBtn.className = 'restart custom-next-btn';
+                    restartBtn.style.display = 'inline-block';
+                } else {
                     let nextBtn = document.createElement('button');
                     nextBtn.id = 'next-btn';
                     nextBtn.textContent = 'Next';
                     nextBtn.className = 'custom-next-btn';
                     nextBtn.onclick = () => {
+                        // advance after acknowledging
                         score++;
                         current++;
                         nextBtn.remove();
-                        showQuestion();
+                        if (current < questions.length) showQuestion(); else {
+                            // End of questions — show final summary and Restart button
+                            questionEl.textContent = '';
+                            answersEl.innerHTML = '';
+                            renderLadder(score);
+                            resultEl.innerHTML = `You reached question ${current} out of ${questions.length}.<br>Your score: $${score * 1000}`;
+                            restartBtn.className = 'restart custom-next-btn';
+                            restartBtn.style.display = 'inline-block';
+                        }
                     };
                     resultEl.parentNode.insertBefore(nextBtn, resultEl.nextSibling);
-                });
+                }
             } else {
                 // incorrect: mark chosen red and correct green
                 btn.classList.add('incorrect');
                 if (answerButtons[correctIdx]) answerButtons[correctIdx].classList.add('correct');
-                resultEl.textContent = 'Not quite! Try again next time!';
+                // compute guaranteed prize based on safety nets
+                const finalPrize = guaranteedPrizeForScore(score);
+                const prizeText = finalPrize > 0 ? `$${finalPrize.toLocaleString()}` : '$0';
+                resultEl.textContent = `Not quite. You won ${prizeText}. Try again next time!`;
                 restartBtn.className = 'restart custom-next-btn';
                 restartBtn.style.display = 'inline-block';
             }
-        }
-
-        function checkAnswer(idx) {
-            if (idx === questions[current].correct) {
-                score++;
-                current++;
-                showQuestion();
-            } else {
-                showResult();
-            }
-        }
-
-        function showResult() {
-            // If no questions generated yet (initial load), do nothing to avoid runtime errors
-            if (!questions || questions.length === 0) {
-                resultEl.textContent = '';
-                restartBtn.style.display = 'none';
-                return;
-            }
-            questionEl.textContent = '';
-            answersEl.innerHTML = '';
-            renderLadder(score);
-            resultEl.innerHTML = `You reached question ${current} out of ${questions.length}.<br>Your score: $${score * 1000}`;
-            restartBtn.style.display = 'inline-block';
         }
     </script>
 </body>
