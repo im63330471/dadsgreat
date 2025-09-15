@@ -119,17 +119,19 @@
         .ladder li.achieved {
             background: #43a047 !important; /* achieved = green */
             color: #fff !important;
-            border: none
+            border-left: 8px solid #fff;
+            border-right: none;
         }
         .ladder li.current {
             background: #ffd600 !important; /* current = yellow */
             color: #d84315 !important;
             font-weight: bold;
-            border: none
+            border-left: 8px solid #fff;
+            border-right: none;
         }
         /* safety net and million styling: same size and bold */
         .ladder li.safetynet, .ladder li.million {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: bold !important;
         }
         /* Remove column layout for small screens, always row */
@@ -187,7 +189,6 @@
              cursor: pointer;
              width: 75% !important; /* wider to avoid wrapping */
              max-width: 340px; /* keep reasonable on narrow screens */
-             white-space: nowrap; /* keep text on one line */
              height: auto !important;
              letter-spacing: 1px;
              transition: background 0.2s;
