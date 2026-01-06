@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRCode Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+        }
+        #textInput {
+            width: 100%;
+            height: 150px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        #chunkSize {
+            width: 100px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #qrcodeContainer {
+            margin-top: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        .qr-item {
+            text-align: center;
+        }
+        .qr-item small {
+            display: block;
+            margin-top: 8px;
+            color: #555;
+        }
+        .qr-canvas {
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>QRCode Generator</h1>
+    <p>Enter text and specify the maximum characters per QR code. The text will be split into chunks of that length, and each chunk will become a separate QR code.</p>
+
+    <label for="textInput">Text to encode (multi-line OK):</label>
+    <textarea id="textInput" placeholder="Enter the text you want to split into QR codes..."></textarea>
+
+    <label for="chunkSize">Chunk size (max characters per QR code):</label>
+    <input type="number" id="chunkSize" value="200" min="1" max="2953">
+
+    <button onclick="generateQRCodes()">Generate QR Codes</button>
+
+    <div id="qrcodeContainer"></div>
+
+    <script>
+        function generateQRCodes() {
+            const text = document.getElementById("textInput").value;
+            const maxChunkSize = parseInt(document.getElementById("chunkSize").value) || 200;
+
+            if (!text) {
+                alert("Please enter some text!");
+                return;
+            }
+            if (maxChunkSize < 1) {
+                alert("Chunk size must be at least 1.");
+                return;
+            }
+
+            // Split text into chunks of maxChunkSize characters
+            const chunks = [];
+            for (let i = 0; i < text.length; i += maxChunkSize) {
+                chunks.push(text.substr(i, maxChunkSize));
+            }
+
+            const container = document.getElementById("qrcodeContainer");
+            container.innerHTML = ""; // Clear previous QR codes
+
+            if (chunks.length === 0) {
+                container.innerHTML = "<p>No chunks to display.</p>";
+                return;
+            }
+
+            // Display total number of QR codes
+            const header = document.createElement("h3");
+            header.textContent = `Generated ${chunks.length} QR code${chunks.length > 1 ? 's' : ''}:`;
+            header.style.width = "100%";
+            container.appendChild(header);
+
+            // Generate one QR code per chunk
+            chunks.forEach((chunk, index) => {
+                const div = document.createElement("div");
+                div.className = "qr-item";
+
+                const title = document.createElement("small");
+                title.textContent = `Part ${index + 1}/${chunks.length} (${chunk.length} chars)`;
+                div.appendChild(title);
+
+                const qrDiv = document.createElement("div");
+                qrDiv.id = `qr-${index}`;
+                div.appendChild(qrDiv);
+
+                container.appendChild(div);
+
+                // Create QR code with fixed module size for readability
+                new QRCode(qrDiv, {
+                    text: chunk,
+                    width: 256,
+                    height: 256,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H // High error correction for max data
+                });
+            });
+        }
+    </script>
+</body>
+</html>
