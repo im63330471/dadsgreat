@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRCode Generator (byte-aware)</title>
+    <title>QRCode Maker v2 (byte-aware)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body {
@@ -59,14 +59,14 @@
     </style>
 </head>
 <body>
-    <h1>QRCode Generator (byte-aware)</h1>
+    <h1>QRCode Maker v2 (byte-aware)</h1>
     <p>Enter text and specify the maximum bytes per QR code (UTF-8). The text will be split into byte-aware chunks so each chunk is safe for QR encoding. You can choose the error-correction level (L/M/Q/H) — lower levels allow more data but less robustness.</p>
 
-    <label for="textInput">Text to encode (multi-line OK):</label>
+    <label for="textInput">Text to encode:</label>
     <textarea id="textInput" placeholder="Enter the text you want to split into QR codes..."></textarea>
 
     <label for="chunkSize">Chunk size (max bytes per QR code):</label>
-    <input type="number" id="chunkSize" value="191" min="1" max="2953">
+    <input type="number" id="chunkSize" value="300" min="1" max="2890">
 
     <label for="eccLevel">Error correction level:</label>
     <select id="eccLevel">
