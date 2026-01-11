@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRCode Generator (byte-aware)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+        }
+        #textInput {
+            width: 100%;
+            height: 150px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        #chunkSize {
+            width: 120px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #qrcodeContainer {
+            margin-top: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        .qr-item {
+            text-align: center;
+            margin-bottom: 50px;
+            width: 280px;
+        }
+        .qr-item small {
+            display: block;
+            margin-top: 8px;
+            color: #555;
+        }
+        .qr-canvas {
+            border: 1px solid #ddd;
+        }
+        .meta {
+            font-size: 13px;
+            color: #333;
+            margin-top: 6px;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>QRCode Generator (byte-aware)</h1>
+    <p>Enter text and specify the maximum bytes per QR code (UTF-8). The text will be split into byte-aware chunks so each chunk is safe for QR encoding. You can choose the error-correction level (L/M/Q/H) — lower levels allow more data but less robustness.</p>
+
+    <label for="textInput">Text to encode (multi-line OK):</label>
+    <textarea id="textInput" placeholder="Enter the text you want to split into QR codes..."></textarea>
+
+    <label for="chunkSize">Chunk size (max bytes per QR code):</label>
+    <input type="number" id="chunkSize" value="191" min="1" max="2953">
+
+    <label for="eccLevel">Error correction level:</label>
+    <select id="eccLevel">
+        <option value="H" selected>H (high)</option>
+        <option value="Q">Q</option>
+        <option value="M">M</option>
+        <option value="L">L (low)</option>
+    </select>
+
+    <button onclick="generateQRCodes()">Generate QR Codes</button>
+
+    <div id="qrcodeContainer"></div>
+
+    <script>
+        // Byte-aware splitting: accumulate by code point (never split a Unicode code point)
+        function splitByUtf8BytesAccumulate(str, maxBytes) {
+            if (maxBytes < 1) throw new Error("maxBytes must be at least 1.");
+            const encoder = new TextEncoder();
+            const decoder = new TextDecoder();
+            const chunks = [];
+            let currentBytes = [];
+            let currentLen = 0;
+
+            for (const ch of str) { // iterate by Unicode code point
+                const b = encoder.encode(ch);
+                if (currentLen + b.length > maxBytes) {
+                    // flush current chunk
+                    chunks.push(decoder.decode(new Uint8Array(currentBytes)));
+                    currentBytes = Array.from(b);
+                    currentLen = b.length;
+                } else {
+                    for (let i = 0; i < b.length; i++) currentBytes.push(b[i]);
+                    currentLen += b.length;
+                }
+            }
+            if (currentLen > 0) {
+                chunks.push(decoder.decode(new Uint8Array(currentBytes)));
+            }
+            return chunks;
+        }
+
+        function getCorrectLevel(letter) {
+            switch (letter) {
+                case 'L': return QRCode.CorrectLevel.L;
+                case 'M': return QRCode.CorrectLevel.M;
+                case 'Q': return QRCode.CorrectLevel.Q;
+                case 'H':
+                default: return QRCode.CorrectLevel.H;
+            }
+        }
+
+        function byteLengthOfString(s) {
+            return new TextEncoder().encode(s).length;
+        }
+
+        function generateQRCodes() {
+            const text = document.getElementById("textInput").value;
+            const maxChunkSize = parseInt(document.getElementById("chunkSize").value) || 200;
+            const eccLetter = document.getElementById("eccLevel").value;
+            const correctLevel = getCorrectLevel(eccLetter);
+
+            if (!text) {
+                alert("Please enter some text!");
+                return;
+            }
+            if (maxChunkSize < 1) {
+                alert("Chunk size must be at least 1.");
+                return;
+            }
+
+            // Split text into byte-aware chunks (maxBytes)
+            const chunks = splitByUtf8BytesAccumulate(text, maxChunkSize);
+
+            const container = document.getElementById("qrcodeContainer");
+            container.innerHTML = ""; // Clear previous QR codes
+
+            if (chunks.length === 0) {
+                container.innerHTML = "<p>No chunks to display.</p>";
+                return;
+            }
+
+            // Display total number of QR codes
+            const header = document.createElement("h3");
+            header.textContent = `Generated ${chunks.length} QR code${chunks.length > 1 ? 's' : ''}:`;
+            header.style.width = "100%";
+            container.appendChild(header);
+
+            // Generate one QR code per chunk and show version info
+            chunks.forEach((chunk, index) => {
+                const div = document.createElement("div");
+                div.className = "qr-item";
+
+                const title = document.createElement("small");
+                title.textContent = `Part ${index + 1}/${chunks.length} (${chunk.length} chars)`;
+                div.appendChild(title);
+
+                const qrDiv = document.createElement("div");
+                qrDiv.id = `qr-${index}`;
+                div.appendChild(qrDiv);
+
+                const meta = document.createElement("div");
+                meta.className = "meta";
+                meta.textContent = "Generating...";
+                div.appendChild(meta);
+
+                container.appendChild(div);
+
+                try {
+                    // Create the QRCode instance and capture the returned object
+                    const qrObj = new QRCode(qrDiv, {
+                        text: chunk,
+                        width: 256,
+                        height: 256,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: correctLevel
+                    });
+
+                    // The library stores the model on _oQRCode. If available, compute version:
+                    if (qrObj && qrObj._oQRCode && typeof qrObj._oQRCode.getModuleCount === 'function') {
+                        const moduleCount = qrObj._oQRCode.getModuleCount();
+                        const version = (moduleCount - 17) / 4;
+                        const byteLen = byteLengthOfString(chunk);
+                        meta.textContent = `ECC=${eccLetter} · bytes=${byteLen} · QR version=${version} (modules=${moduleCount})`;
+                    } else {
+                        // Fallback: show byte length only
+                        const byteLen = byteLengthOfString(chunk);
+                        meta.textContent = `ECC=${eccLetter} · bytes=${byteLen} · QR version=unknown`;
+                    }
+                } catch (err) {
+                    // If the library throws (e.g., data overflow), show that and log error
+                    console.error("QR generation error for chunk", index, err);
+                    meta.textContent = `Error generating QR: ${err && err.message ? err.message : String(err)}`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
