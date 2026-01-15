@@ -39,17 +39,18 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 50px;
+      gap: 20px;
     }
     .qr-block {
       text-align: center;
-      font-size: 13px;
+      font-size: 12px;
+      margin-top: 100px;
+      margin-bottom: 25px;
     }
     .qr-label {
       margin-bottom: 4px;
     }
     #versionId {
-      margin-top: 15px;
       font-size: 12px;
       color: #555;
       text-align: center;
@@ -74,7 +75,7 @@
   <div id="qrResults"></div>
 
   <!-- Version ID based on Perplexity's response -->
-  <div id="versionId">QR-Perplexity-2026-01-15-11-38</div>
+  <div id="versionId">QR-Perplexity-2026-01-15-11-58</div>
 
   <script>
     const inputTextEl = document.getElementById('inputText');
@@ -127,8 +128,8 @@
         // Create QR code for this chunk
         new QRCode(qrContainer, {
           text: chunk,
-          width: 256,
-          height: 256,
+          width: 300,
+          height: 300,
           colorDark: '#000000',
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.H
