@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QRCode Maker v3</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        #inputText {
+            width: 100%;
+            height: 200px;
+        }
+        #controls {
+            margin-top: 10px;
+        }
+        #runBtn {
+            background-color: green;
+            color: white;
+            padding: 5px 10px;
+        }
+        #clearBtn {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+        }
+        #maxLength {
+            margin-left: 10px;
+            width: 100px;
+        }
+        #qrcodes {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #qrcodes > div {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="inputText"></textarea>
+    <div id="controls">
+        <button id="runBtn">Run</button>
+        <button id="clearBtn">Clear</button>
+        <input type="number" id="maxLength" value="100" min="1">
+    </div>
+    <div id="qrcodes"></div>
+
+    <script>
+        document.getElementById('runBtn').addEventListener('click', function() {
+            const text = document.getElementById('inputText').value;
+            const maxLen = parseInt(document.getElementById('maxLength').value);
+            if (!text || isNaN(maxLen) || maxLen < 1) {
+                alert('Please enter valid text and a positive number.');
+                return;
+            }
+            const container = document.getElementById('qrcodes');
+            container.innerHTML = '';
+            const chunks = [];
+            for (let i = 0; i < text.length; i += maxLen) {
+                chunks.push(text.substring(i, i + maxLen));
+            }
+            chunks.forEach((chunk, index) => {
+                const qrDiv = document.createElement('div');
+                qrDiv.id = 'qrcode' + index;
+                container.appendChild(qrDiv);
+                new QRCode(qrDiv, {
+                    text: chunk,
+                    width: 128,
+                    height: 128
+                });
+            });
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('qrcodes').innerHTML = '';
+        });
+    </script>
+</body>
+</html>
