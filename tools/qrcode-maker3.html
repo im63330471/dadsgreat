@@ -7,8 +7,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         #inputText {
-            margin: auto;
-            width: 80%;
+            display: block;
+            width: calc(100% - 20px);
+            margin: 10px auto;
+            box-sizing: border-box; /* Ensures padding/margins are included in width */
+            overflow-x: hidden;
+            word-wrap: break-word; /* Ensures text wraps to prevent internal scrolling */
         }
         #controls {
             margin-top: 10px;
@@ -45,7 +49,7 @@
         <input type="number" id="maxLength" value="100" min="1">
     </div>
     <div id="qrcodes"></div>
-    <p>260115-1155</p>
+    <p>260115-1244</p>
     <script>
         document.getElementById('runBtn').addEventListener('click', function() {
             const text = document.getElementById('inputText').value;
