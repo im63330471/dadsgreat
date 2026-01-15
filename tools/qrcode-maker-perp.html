@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>QR Code Chunk Generator</title>
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script> <!-- [web:1][web:4][web:7] -->
   <style>
@@ -58,10 +59,7 @@
   <!-- Row 2: OK, number box, clear -->
   <div class="row" id="controls">
     <button id="okBtn">OK</button>
-    <label>
-      Max chars / QR:
-      <input id="maxChars" type="number" min="1" value="50" />
-    </label>
+    <input id="maxChars" type="number" min="1" value="13">
     <button id="clearBtn">Clear</button>
   </div>
 
