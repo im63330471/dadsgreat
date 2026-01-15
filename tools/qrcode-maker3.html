@@ -8,6 +8,7 @@
     <style>
         #inputText {
             display: block;
+            height: 200px;
             width: 100%;
             margin: auto;           /* Centre it horizontally within its container */
             box-sizing: border-box; /* Include padding & margins in width */
@@ -17,9 +18,10 @@
             justify-content: center;    /* Center all children horizontally */
         }
         #controls button {
-            color: white;
-            padding: 5px 10px;
+            heigth: 50px;
             width: 40%;
+            margin: 10px;
+            color: white;
         }
         #runBtn {
             background-color: green;
@@ -29,6 +31,7 @@
         }
         #maxLength {
             width: 40px;
+            margin: 10px;
         }
         #qrcodes {
             margin-top: 20px;
@@ -45,10 +48,10 @@
     <div id="controls">
         <button id="runBtn">Run</button>
         <button id="clearBtn">Clear</button>
-        <input type="number" id="maxLength" value="100" min="1">
+        <input type="number" id="maxLength" value="9" min="1">
     </div>
     <div id="qrcodes"></div>
-    <p>260115-1414</p>
+    <p>260115-1418</p>
     <script>
         document.getElementById('runBtn').addEventListener('click', function() {
             const text = document.getElementById('inputText').value;
