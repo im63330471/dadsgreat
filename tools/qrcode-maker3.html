@@ -6,6 +6,9 @@
     <title>QRCode Maker v3</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
+        * {
+            font-size: large;
+        }
         #inputText {
             display: block;
             height: 200px;
@@ -16,7 +19,6 @@
         #controls {
             display: flex;              /* Activate flexbox */
             justify-content: center;    /* Center all children horizontally */
-            font-size: large;
         }
         #controls button {
             heigth: 100px;
@@ -35,12 +37,9 @@
             margin: 10px;
         }
         #qrcodes {
-            margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
+            display: block;
         }
         #qrcodes > div {
-            display: block;
             margin: 20px;
         }
     </style>
@@ -53,7 +52,7 @@
         <input type="number" id="maxLength" value="9" min="1">
     </div>
     <div id="qrcodes"></div>
-    <center>260115-1425</center>
+    <center>260115-1432</center>
     <script>
         document.getElementById('runBtn').addEventListener('click', function() {
             const text = document.getElementById('inputText').value;
@@ -74,8 +73,8 @@
                 container.appendChild(qrDiv);
                 new QRCode(qrDiv, {
                     text: chunk,
-                    width: 128,
-                    height: 128
+                    width: 512,
+                    height: 512
                 });
             });
         });
