@@ -8,27 +8,26 @@
     <style>
         #inputText {
             display: block;
-            width: calc(100% - 20px);
-            margin: 10px auto;
-            margin-top: 10px
-            box-sizing: border-box; /* Ensures padding/margins are included in width */
+            width: calc(100% - 40px);
+            margin: 20px auto;
+            box-sizing: border-box; /* Include padding & margins in width */
         }
         #controls {
-            margin-top: 10px;
+        
+        }
+        #controls button {
+            color: white;
+            padding: 5px 10px;
+            width: 30%;
         }
         #runBtn {
             background-color: green;
-            color: white;
-            padding: 5px 10px;
         }
         #clearBtn {
             background-color: red;
-            color: white;
-            padding: 5px 10px;
         }
         #maxLength {
-            margin-left: 10px;
-            width: 100px;
+            width: 50px;
         }
         #qrcodes {
             margin-top: 20px;
@@ -48,7 +47,7 @@
         <input type="number" id="maxLength" value="100" min="1">
     </div>
     <div id="qrcodes"></div>
-    <p>260115-1247</p>
+    <p>260115-1254</p>
     <script>
         document.getElementById('runBtn').addEventListener('click', function() {
             const text = document.getElementById('inputText').value;
