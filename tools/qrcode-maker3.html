@@ -16,11 +16,12 @@
         #controls {
             display: flex;              /* Activate flexbox */
             justify-content: center;    /* Center all children horizontally */
+            font-size: large;
         }
         #controls button {
-            heigth: 50px;
+            heigth: 100px;
             width: 40%;
-            margin: 10px;
+            margin: 5px;
             color: white;
         }
         #runBtn {
@@ -39,7 +40,8 @@
             flex-wrap: wrap;
         }
         #qrcodes > div {
-            margin: 10px;
+            display: block;
+            margin: 20px;
         }
     </style>
 </head>
@@ -51,7 +53,7 @@
         <input type="number" id="maxLength" value="9" min="1">
     </div>
     <div id="qrcodes"></div>
-    <p>260115-1418</p>
+    <center>260115-1425</center>
     <script>
         document.getElementById('runBtn').addEventListener('click', function() {
             const text = document.getElementById('inputText').value;
