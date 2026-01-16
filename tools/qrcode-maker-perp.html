@@ -68,6 +68,7 @@
   <div id="controls">
     <input id="okBtn" type="button" value="OK">
     <input id="maxChars" type="number" min="1" value="13">
+    <input id="testBtn" type="button" value="Test">
     <input id="clearBtn" type="button" value="Clear">
   </div>
   <div id="qrResults"></div>
@@ -77,11 +78,16 @@
     const inputTextEl = document.getElementById('inputText');
     const maxCharsEl = document.getElementById('maxChars');
     const okBtn = document.getElementById('okBtn');
+    const testBtn = document.getElementById('testBtn');
     const clearBtn = document.getElementById('clearBtn');
     const qrResultsEl = document.getElementById('qrResults');
 
     function clearResults() {
       qrResultsEl.innerHTML = '';
+    }
+
+    function dummyInput() {
+      inputTextEl.value = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent gravida venenatis cursus. Vivamus justo ligula, consequat eget luctus eu, posuere non enim. Nam porta quam sit amet est gravida, non vehicula mauris varius. Nam eu tellus metus.';
     }
 
     function generateChunks(text, size) {
@@ -134,7 +140,7 @@
     }
 
     okBtn.addEventListener('click', generateQRCodes);
-
+    testBtn.addEventListener('click', dummyInput);
     clearBtn.addEventListener('click', () => {
       inputTextEl.value = '';
       clearResults();
