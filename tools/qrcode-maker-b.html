@@ -6,6 +6,9 @@
   <title>QR Code Maker B</title>
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script> <!-- [web:1][web:4][web:7] -->
   <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
     #inputText {
       width: 100%;
       box-sizing: border-box;
@@ -21,14 +24,19 @@
       width: 10%;
     }
     #okBtn, #testBtn, #clearBtn {
-      font-family: Arial, sans-serif;
       height: 42px;
       width: 25%;
       color: white;
     }
-    #okBtn {background-color: green;}
-    #testBtn {background-color: blue;}
-    #clearBtn {background-color: red;}
+    #okBtn {
+      background-color: green;
+    }
+    #testBtn {
+      background-color: blue;
+    }
+    #clearBtn {
+      background-color: red;
+    }
     #qrResults {
       display: flex;
       flex-wrap: wrap;
