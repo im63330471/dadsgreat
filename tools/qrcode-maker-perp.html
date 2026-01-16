@@ -25,14 +25,21 @@
       align-items: center;       /* center vertically */
       gap: 10px;
     }
-    #controls button,
+    #controls input[type="button"],
     #controls input[type="number"] {
-      padding: 6px 10px;
-      font-size: 14px;
+      padding: 6px;
+      font-size: 18px;
     }
-    button {
+    #okBtn, #clearBtn {
       heigth: 50px;
       width: 200px;
+      color: white;
+    }
+    #okBtn {
+      background-color: green;
+    }
+    #clearBtn {
+      background-color: red;
     }
     #qrResults {
       margin-top: 15px;
@@ -66,16 +73,13 @@
 
   <!-- Row 2: OK, number box, clear -->
   <div class="row" id="controls">
-    <button id="okBtn">OK</button>
+    <input id="okBtn" type="button">OK</input>
     <input id="maxChars" type="number" min="1" value="13">
-    <button id="clearBtn">Clear</button>
+    <input id="clearBtn" type="button">Clear</input>
   </div>
 
-  <!-- Area for QR code results -->
   <div id="qrResults"></div>
-
-  <!-- Version ID based on Perplexity's response -->
-  <div id="versionId">QR-Perplexity-2026-01-15-11-58</div>
+  <div id="versionId">2026-1013</div>
 
   <script>
     const inputTextEl = document.getElementById('inputText');
