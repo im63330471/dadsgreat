@@ -62,6 +62,9 @@
       color: #555;
       text-align: center;
     }
+    * {
+      margin: 1px solid black;
+    }
   </style>
 </head>
 <body>
@@ -73,9 +76,9 @@
 
   <!-- Row 2: OK, number box, clear -->
   <div class="row" id="controls">
-    <input id="okBtn" type="button">OK</input>
+    <input id="okBtn" type="button" value="OK">
     <input id="maxChars" type="number" min="1" value="13">
-    <input id="clearBtn" type="button">Clear</input>
+    <input id="clearBtn" type="button" value="Clear">
   </div>
 
   <div id="qrResults"></div>
