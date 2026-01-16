@@ -12,9 +12,8 @@
       padding: 0;
     }
     #inputText {
-      /* width: 100%;
-      box-sizing: border-box; */
-      display: block;
+      width: 100%;
+      box-sizing: border-box;
       padding: 8px;
       font-size: 24px;
     }
@@ -65,10 +64,12 @@
 <body>
 
   <textarea id="inputText" rows="4" placeholder="Enter text to encode"></textarea>
-  <input id="okBtn" type="button" value="OK">
-  <input id="maxChars" type="number" min="1" value="13">
-  <input id="testBtn" type="button" value="Test">
-  <input id="clearBtn" type="button" value="Clear">
+  <center>
+    <input id="okBtn" type="button" value="OK">
+    <input id="maxChars" type="number" min="1" value="13">
+    <input id="testBtn" type="button" value="Test">
+    <input id="clearBtn" type="button" value="Clear">
+  </center>
   <div id="qrResults"></div>
   <div id="versionId">2026-1444</div>
 
