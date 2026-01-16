@@ -6,15 +6,10 @@
   <title>QR Code Chunk Generator</title>
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script> <!-- [web:1][web:4][web:7] -->
   <style>
-    /* {
-      border: 1px solid black;
-      margin: 0;
-      padding: 0;
-    } */
     #inputText {
       width: 100%;
       box-sizing: border-box;
-      /* padding: 8px; */
+      padding: 8px;
       font-size: 24px;
     }
     input { /* buttons & number input */
@@ -23,12 +18,12 @@
       font-size: 18px;
     }
     #maxChars {
-      width: 5%;
+      width: 10%;
     }
     #okBtn, #testBtn, #clearBtn {
       font-family: Arial, sans-serif;
-      height: 36px;
-      width: 20%;
+      height: 42px;
+      width: 25%;
       color: white;
     }
     #okBtn {background-color: green;}
@@ -45,8 +40,8 @@
       margin-bottom: 64px;
     }
     .qr-label {
-      font-size: 12px;
-      margin-bottom: 4px;
+      font-size: 18px;
+      margin-bottom: 6px;
     }
     #versionId {
       text-align: center;
@@ -65,7 +60,7 @@
     <input id="clearBtn" type="button" value="Clear">
   </center>
   <div id="qrResults"></div>
-  <div id="versionId">2026-1444</div>
+  <div id="versionId">2026-1558</div>
 
   <script>
     const inputTextEl = document.getElementById('inputText');
@@ -80,7 +75,10 @@
     }
 
     function dummyInput() {
-      inputTextEl.value = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent gravida venenatis cursus. Vivamus justo ligula, consequat eget luctus eu, posuere non enim. Nam porta quam sit amet est gravida, non vehicula mauris varius. Nam eu tellus metus.';
+      inputTextEl.value = 'Lorem ipsum dolor sit amet, consectetur adipiscing
+      elit. Praesent gravida venenatis cursus. Vivamus justo ligula, consequat
+      eget luctus eu, posuere non enim. Nam porta quam sit amet est gravida, non
+      vehicula mauris varius. Nam eu tellus metus.';
     }
 
     function generateChunks(text, size) {
