@@ -8,9 +8,8 @@
   <style>
     * {
       border: 1px solid black;
-    }
-    body {
-      font-family: Arial, sans-serif;
+      margin: none;
+      padding: none;
     }
     #inputText {
       width: 100%;
@@ -28,23 +27,24 @@
       padding: 6px;
       font-size: 18px;
     }
-    #okBtn, #clearBtn {
-      heigth: 50px;
-      width: 200px;
+    #okBtn, #testBtn, #clearBtn {
+      font-family: Arial, sans-serif;
+      width: 30%;
       color: white;
     }
     #okBtn {
       background-color: green;
     }
+    #testBtn {
+      background-color: blue;
+    }
     #clearBtn {
       background-color: red;
     }
     #qrResults {
-      margin-top: 15px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
     }
     .qr-block {
       text-align: center;
@@ -72,7 +72,7 @@
     <input id="clearBtn" type="button" value="Clear">
   </div>
   <div id="qrResults"></div>
-  <div id="versionId">2026-1030</div>
+  <div id="versionId">2026-1444</div>
 
   <script>
     const inputTextEl = document.getElementById('inputText');
