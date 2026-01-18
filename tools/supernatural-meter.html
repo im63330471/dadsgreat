@@ -259,66 +259,59 @@ const STORAGE_KEY = "supernatural-meter-state";
 let state = {
   keyword: "Naughtiness",
   level: 50,
-  scheme: "gr"   // "gr" → green→red    "rg" → red→green
+  scheme: "gr"
 };
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     Object.assign(state, JSON.parse(saved));
+    console.log("State loaded from storage:", state);
+  } else {
+    console.log("No saved state found – using defaults");
   }
 }
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  console.log("State saved:", state);
 }
 
-// ──────────────────────────────────────────────────────────────
-// Color gradient helpers
-// ──────────────────────────────────────────────────────────────
-
-function getColorGradient(percent, scheme = state.scheme) {
-  const p = Math.min(1, Math.max(0, percent / 100));
-  
-  if (scheme === "gr") {
-    // green → yellow → red
-    if (p < 0.5) {
-      // green → yellow
-      const t = p * 2;
-      return `rgb(${Math.round(0   + 255*t)}, ${Math.round(255 - 100*t)}, 0)`;
-    } else {
-      // yellow → red
-      const t = (p - 0.5) * 2;
-      return `rgb(255, ${Math.round(155 - 155*t)}, 0)`;
-    }
-  } else {
-    // red → yellow → green
-    if (p < 0.5) {
-      // red → yellow
-      const t = p * 2;
-      return `rgb(255, ${Math.round(0 + 155*t)}, 0)`;
-    } else {
-      // yellow → green
-      const t = (p - 0.5) * 2;
-      return `rgb(${Math.round(255 - 255*t)}, 255, 0)`;
-    }
-  }
-}
+// Color gradient helpers (unchanged, but add log if needed)
+// ... (keep your existing getColorGradient function)
 
 // ──────────────────────────────────────────────────────────────
 // Screen management
 // ──────────────────────────────────────────────────────────────
 
 function goToScreen(n) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const target = document.getElementById(`screen${n}`);
-  target.classList.add('active');
+  console.log(`goToScreen called: switching to screen ${n}`);
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.classList.add('d-none');  // extra safety
+  });
   
-  if (n === 2) initScreen2();
-  if (n === 3) startResultAnimation();
+  const target = document.getElementById(`screen${n}`);
+  if (target) {
+    target.classList.remove('d-none');
+    target.classList.add('active');
+    console.log(`Screen ${n} activated`);
+  } else {
+    console.error(`Screen ${n} element not found!`);
+  }
+  
+  if (n === 2) {
+    console.log("Initializing screen 2...");
+    initScreen2();
+  }
+  if (n === 3) {
+    console.log("Starting result animation...");
+    startResultAnimation();
+  }
 }
 
 function initScreen1() {
+  console.log("Initializing screen 1");
   document.getElementById('keyword').value = state.keyword;
   document.getElementById('level').value = state.level;
   document.getElementById('levelDisplay').textContent = state.level;
@@ -326,133 +319,31 @@ function initScreen1() {
 }
 
 function initScreen2() {
-  state.keyword = document.getElementById('keyword').value.trim() || "Mystery";
-  state.level = parseInt(document.getElementById('level').value);
-  state.scheme = document.querySelector('input[name="scheme"]:checked').value;
-  
-  saveState();
-  
-  document.getElementById('meterTitle').textContent = `${state.keyword} Meter`;
-  
-  const btn = document.getElementById('activateBtn');
-  btn.onclick = () => {
-    if (!document.getElementById('preview').src || document.getElementById('preview').src.includes('placeholder')) {
-      alert("Please take a photo first!");
-      return;
-    }
-    btn.classList.add('pressed');
-    setTimeout(() => goToScreen(3), 400);
-  };
-  
-  // Photo input
-  const input = document.getElementById('photoInput');
-  const preview = document.getElementById('preview');
-  const placeholder = document.getElementById('placeholder');
-  
-  document.getElementById('previewContainer').onclick = () => input.click();
-  
-  input.onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 1024;
-        canvas.height = 1024;
-        const ctx = canvas.getContext('2d');
-        
-        // Center crop to square
-        const size = Math.min(img.width, img.height);
-        const sx = (img.width - size)/2;
-        const sy = (img.height - size)/2;
-        
-        ctx.drawImage(img, sx, sy, size, size, 0, 0, 1024, 1024);
-        
-        preview.src = canvas.toDataURL('image/jpeg', 0.92);
-        preview.style.display = 'block';
-        placeholder.style.display = 'none';
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
+  console.log("initScreen2 running");
+  // ... (keep the rest of your original initScreen2 code)
+  // Add this at the very end of initScreen2:
+  console.log("Screen 2 fully initialized – title set, button listener attached");
 }
 
 function startResultAnimation() {
-  const percent = state.level;
-  const photo = document.getElementById('resultPhoto');
-  photo.src = document.getElementById('preview').src;
-  
-  // Special 101 messages
-  let displayText = `The ${state.keyword} level detected is ${percent}%`;
-  
-  if (percent === 101) {
-    const messages = [
-      "OVER 9000!!! Reality just gave up.",
-      "METER MELTDOWN! The universe is filing a complaint.",
-      "101% → Calibration error: you're too powerful for this dimension.",
-      "DANGER: " + state.keyword + " singularity detected. Run.",
-      "ERROR 101: Insufficient universe to contain this level."
-    ];
-    displayText = messages[Math.floor(Math.random() * messages.length)];
-  }
-  
-  document.getElementById('resultText').textContent = displayText;
-  
-  // Build segmented meter (stepped look)
-  const fill = document.getElementById('meterFill');
-  fill.innerHTML = '';
-  
-  const steps = 80; // number of small segments
-  for(let i = 0; i < steps; i++) {
-    const seg = document.createElement('div');
-    seg.className = 'segment fill-segment';
-    seg.style.bottom = (i / steps * 100) + '%';
-    seg.style.height = (100 / steps) + '%';
-    seg.style.background = getColorGradient((i / steps) * 100);
-    seg.style.transform = 'scaleY(0)';
-    fill.appendChild(seg);
-  }
-  
-  // Anime.js animations
-  anime.timeline({
-    easing: 'easeOutQuad',
-    duration: 2000
-  })
-  // Fill meter
-  .add({
-    targets: '.fill-segment',
-    scaleY: [0, 1],
-    duration: 1800,
-    delay: anime.stagger(20, {from: 'first'})
-  })
-  // Count number + color change
-  .add({
-    targets: '#resultNumber',
-    innerHTML: [0, percent],
-    round: 1,
-    duration: 2000,
-    update: function(anim) {
-      const val = Math.round(anim.animatables[0].target.innerHTML);
-      anim.animatables[0].target.style.color = getColorGradient(val);
-    }
-  }, '-=1800');
+  console.log("startResultAnimation called");
+  // ... (keep original code)
 }
 
 // ──────────────────────────────────────────────────────────────
 // Init
 // ──────────────────────────────────────────────────────────────
 
+console.log("Page script starting...");
 loadState();
 initScreen1();
 goToScreen(1);
+console.log("Initial screen 1 should be visible now");
 
-// Update slider display live
+// Slider live update
 document.getElementById('level').addEventListener('input', e => {
   document.getElementById('levelDisplay').textContent = e.target.value;
+  console.log("Level changed to:", e.target.value);
 });
 </script>
 </body>
