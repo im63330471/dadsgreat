@@ -2,11 +2,11 @@
 Features confirmed:
 	•	Single HTML file
 	•	Dark matrix style (black background, glowing green text)
-	•	3 screens with fade transitions
+	•	2 screens
 	•	Saves keyword / value / colorscheme in localStorage (auto-load on next visit)
 	•	Mobile first (camera input preferred)
 	•	Image → center-cropped & resized to 1024×1024 via canvas
-	•	Big glowing red circular button + hazard stripes frame
+	•	Glowing red circular button + white solid border + square hazard stripes round corner square behind
 	•	Vertical segmented progress bar (small rectangles) with stepped gradient
 	•	Anime.js for:         • vertical bar filling (2 seconds)         • number counting up + color changing
 	•	Special 101 messages (random from 5 funny variants)
@@ -77,6 +77,20 @@ Features confirmed:
       position: relative;
       margin: 40px auto;
       cursor: pointer;
+    }
+    
+    .glow-button {
+      margin: 80px auto 40px !important;  /* more top/bottom space */
+    }
+
+    #previewContainer {
+      border: 4px solid #0f0 !important;
+      background: #001100 !important;
+    }
+
+    #placeholder {
+      font-size: 1.4rem !important;
+      color: #0f0 !important;
     }
     
     .glow-button.pressed {
