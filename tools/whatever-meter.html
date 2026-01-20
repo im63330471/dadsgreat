@@ -1,19 +1,9 @@
-<!--
-by Copilot
-Features Included
-• Setup Screen: keyword input, slider (0–101), radio buttons for color scheme.
-• Meter Screen: header with keyword, photo upload, start button.
-• Animated progress bar: fills with rectangles in chosen color scheme.
-• Result messages:• 0–99 → low/moderate/high/very high.
-• 100 → funny sayings.
-• 101 → exaggerated funny sayings.
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Whatever Purpose Meter</title>
+  <title>Whatever Meter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -39,51 +29,89 @@ Features Included
       font-size: 1.2em;
       margin-top: 20px;
     }
+    #imagePreview {
+      display: none;
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>Whatever Purpose Meter</h1>
+  <h1 id="mainTitle">Whatever Meter</h1>
 
   <!-- Setup Screen -->
   <div id="setupScreen" class="screen active">
     <label>Keyword: <input type="text" id="keywordInput"></label><br><br>
-    <label>Test Result (0–101): 
+    <label>Test Result: 
       <input type="range" id="resultSlider" min="0" max="101" value="50">
       <span id="sliderValue">50</span>%
     </label><br><br>
-    <label>Color Scheme:</label><br>
+    <label>Color Scheme:<br>
     <input type="radio" name="colorScheme" value="gyr" checked> Green → Yellow → Red<br>
-    <input type="radio" name="colorScheme" value="ryg"> Red → Yellow → Green<br><br>
+    <input type="radio" name="colorScheme" value="ryg"> Red → Yellow → Green</label><br><br>
     <button onclick="goToMeter()">Submit</button>
   </div>
 
   <!-- Meter Screen -->
   <div id="meterScreen" class="screen">
     <h2 id="meterHeader"></h2>
-    <input type="file" accept="image/*" capture="camera"><br><br>
-    <button onclick="startMeter()">Start</button>
-    <div class="progress-bar" id="progressBar"></div>
+    <input type="file" id="fileInput" accept="image/*" capture="camera"><br><br>
+    <img id="imagePreview" alt="Preview">
+    <div class="progress-bar" id="progressBar" style="display:none;"></div>
+    <button id="startBtn" onclick="startMeter()" style="display:none;">Start</button>
     <div id="resultMessage"></div>
   </div>
 
   <script>
+
+    window.onload = function() {
+      const savedKeyword = localStorage.getItem("meterKeyword");
+      const savedResult = localStorage.getItem("meterResult");
+      const savedScheme = localStorage.getItem("meterColorScheme");
+
+      if (savedKeyword) {
+        document.getElementById("keywordInput").value = savedKeyword;
+      }
+      if (savedResult) {
+        document.getElementById("resultSlider").value = savedResult;
+        document.getElementById("sliderValue").textContent = savedResult;
+      }
+      if (savedScheme) {
+        document.querySelector(`input[name="colorScheme"][value="${savedScheme}"]`).checked = true;
+      }
+    };
+
     let keyword = "";
     let resultValue = 0;
     let colorScheme = "gyr";
 
     document.getElementById("resultSlider").addEventListener("input", function() {
-      document.getElementById("sliderValue").textContent = this.value;
+    document.getElementById("sliderValue").textContent = this.value;
     });
 
     function goToMeter() {
-      keyword = document.getElementById("keywordInput").value || "Whatever";
+      keyword = document.getElementById("keywordInput").value.trim() || "unknown";
       resultValue = parseInt(document.getElementById("resultSlider").value);
       colorScheme = document.querySelector('input[name="colorScheme"]:checked').value;
 
+      // Save to localStorage
+      localStorage.setItem("meterKeyword", keyword);
+      localStorage.setItem("meterResult", resultValue);
+      localStorage.setItem("meterColorScheme", colorScheme);
+      
       document.getElementById("setupScreen").classList.remove("active");
       document.getElementById("meterScreen").classList.add("active");
-      document.getElementById("meterHeader").textContent = keyword + " Meter";
 
+      // Capitalize first letter for header
+      const capitalizedKeyword = keyword.charAt(0).toUpperCase() + keyword.slice(1);
+      document.getElementById("meterHeader").textContent = capitalizedKeyword + " Meter";
+
+      // Hide the main title h1
+      document.getElementById("mainTitle").style.display = "none";
+      
       // Build progress bar rectangles
       const bar = document.getElementById("progressBar");
       bar.innerHTML = "";
@@ -92,13 +120,34 @@ Features Included
         rect.className = "progress-rect";
         bar.appendChild(rect);
       }
+
+      // Image preview setup
+      const fileInput = document.getElementById("fileInput");
+      fileInput.addEventListener("change", function() {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = document.getElementById("imagePreview");
+            img.src = e.target.result;
+            img.style.display = "block";
+            
+            // Show progress bar and start button once image is chosen
+            document.getElementById("progressBar").style.display = "flex";
+            document.getElementById("startBtn").style.display = "inline-block";
+            
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     }
 
     function startMeter() {
       const rects = document.querySelectorAll(".progress-rect");
       let filled = 0;
+      const target = Math.round((resultValue / 101) * rects.length); // stop at test result
       const interval = setInterval(() => {
-        if (filled >= rects.length) {
+        if (filled >= target) {
           clearInterval(interval);
           showResult();
           return;
@@ -112,7 +161,6 @@ Features Included
     function getColor(ratio) {
       let r, g;
       if (colorScheme === "gyr") {
-        // Green → Yellow → Red
         if (ratio < 0.5) {
           r = Math.floor(510 * ratio);
           g = 255;
@@ -121,7 +169,6 @@ Features Included
           g = Math.floor(255 - 510 * (ratio - 0.5));
         }
       } else {
-        // Red → Yellow → Green
         if (ratio < 0.5) {
           g = Math.floor(510 * ratio);
           r = 255;
@@ -135,25 +182,26 @@ Features Included
 
     function showResult() {
       let message = "";
+      const lowerKeyword = keyword.toLowerCase();
       if (resultValue >= 0 && resultValue <= 99) {
         let level = "";
         if (resultValue < 25) level = "low";
         else if (resultValue < 50) level = "moderate";
         else if (resultValue < 75) level = "high";
         else level = "very high";
-        message = `The ${keyword} level detected is ${resultValue}% which is ${level}.`;
+        message = `The ${lowerKeyword} level detected is ${resultValue}% which is ${level}.`;
       } else if (resultValue === 100) {
         const sayings = [
-          `The ${keyword} meter just exploded!`,
-          `You maxed out the ${keyword} scale!`,
-          `Warning: ${keyword} overload detected!`
+          `The ${lowerKeyword} meter just exploded!`,
+          `You maxed out the ${lowerKeyword} scale!`,
+          `Warning: ${lowerKeyword} overload detected!`
         ];
         message = sayings[Math.floor(Math.random() * sayings.length)];
       } else if (resultValue === 101) {
         const extremeSayings = [
-          `Reality has collapsed under your ${keyword} power!`,
-          `The universe cannot contain this much ${keyword}!`,
-          `Scientists are baffled: ${keyword} has reached mythical levels!`
+          `Reality has collapsed under your ${lowerKeyword} power!`,
+          `The universe cannot contain this much ${lowerKeyword}!`,
+          `Scientists are baffled: ${lowerKeyword} has reached mythical levels!`
         ];
         message = extremeSayings[Math.floor(Math.random() * extremeSayings.length)];
       }
