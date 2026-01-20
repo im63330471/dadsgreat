@@ -140,7 +140,8 @@
             img.src = e.target.result;
             img.style.display = "block";
             
-            // Show progress bar and start button once image is chosen
+            // UI update after image is chosen
+            document.getElementById("fileInput").style.display = "none";
             document.getElementById("progressBar").style.display = "flex";
             document.getElementById("startBtn").style.display = "inline-block";
             
