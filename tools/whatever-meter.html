@@ -9,6 +9,8 @@
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 20px;
+      background-color: black;
+      color: rgb(255, 255, 0);
     }
     .screen { display: none; }
     .active { display: block; }
@@ -37,6 +39,9 @@
       margin-top: 10px;
       margin-bottom: 20px;
     }
+    h1 {
+      font-size: 4em;
+    }
   </style>
 </head>
 <body>
@@ -57,7 +62,7 @@
 
   <!-- Meter Screen -->
   <div id="meterScreen" class="screen">
-    <h2 id="meterHeader"></h2>
+    <h1 id="meterHeader"></h1>
     <input type="file" id="fileInput" accept="image/*" capture="camera"><br><br>
     <img id="imagePreview" alt="Preview">
     <div class="progress-bar" id="progressBar" style="display:none;"></div>
@@ -143,6 +148,7 @@
     }
 
     function startMeter() {
+      document.getElementById("startBtn").style.display = "none"; // hide start button
       const rects = document.querySelectorAll(".progress-rect");
       let filled = 0;
       const target = Math.round((resultValue / 101) * rects.length); // stop at test result
