@@ -84,7 +84,7 @@ row 2, run button, clear number, input box
     <input id="clearBtn" type="button" value="Clear">
   </center>
   <div id="qrResults"></div>
-  <div id="versionId">2026-1558</div>
+  <div id="versionId">2026-1956</div>
 
   <script>
     const inputTextEl = document.getElementById('inputText');
@@ -117,7 +117,7 @@ row 2, run button, clear number, input box
       clearResults();
 
       if (!text.length || !maxChars || maxChars <= 0) {
-        alert('Please enter text and a valid max characters value.');
+        inputTextEl.value = ('Please enter text and a valid max characters value.');
         return;
       }
 
