@@ -154,8 +154,9 @@ row 2, run button, clear number, input box
     okBtn.addEventListener('click', generateQRCodes);
     testBtn.addEventListener('click', dummyInput);
     clearBtn.addEventListener('click', () => {
-      inputTextEl.value = '';
       clearResults();
+      inputTextEl.value = '';
+      inputTextEl.focus();
     });
   </script>
 </body>
