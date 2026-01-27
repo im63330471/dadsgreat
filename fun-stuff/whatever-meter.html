@@ -44,6 +44,9 @@
     #setupScreen {
       font-size: 1.5em;
     }
+    .setupSubHeader {
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -53,18 +56,18 @@
   <!-- Setup Screen -->
   <div id="setupScreen" class="screen active">
     <label>
-      <h2>Keyword (Noun):</h2>
+      <p class="setupSubHeader">Keyword (Noun):</p>
       <input type="text" id="keywordInput">
     </label>
     <br><br>
     <label>
-      <h2>Test Result:</h2>
+      <p class="setupSubHeader">Test Result:</p>
       <input type="range" id="resultSlider" min="0" max="101" value="50">
       <span id="sliderValue">50</span>%
     </label>
     <br><br>
     <label>
-      <h2>Color Scheme:</h2>
+      <p class="setupSubHeader">Color Scheme:</p>
       <input type="radio" name="colorScheme" value="gyr" checked> Green → Yellow → Red
       <br>
       <input type="radio" name="colorScheme" value="ryg"> Red → Yellow → Green
