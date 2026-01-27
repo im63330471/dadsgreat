@@ -52,22 +52,24 @@
 
   <!-- Setup Screen -->
   <div id="setupScreen" class="screen active">
-    <label>Keyword (Noun):
-      <br>
+    <label>
+      <h2>Keyword (Noun):</h2>
       <input type="text" id="keywordInput">
     </label>
-    <br>
-    <br>
-    <label>Test Result:
-      <br>
+    <br><br>
+    <label>
+      <h2>Test Result:</h2>
       <input type="range" id="resultSlider" min="0" max="101" value="50">
       <span id="sliderValue">50</span>%
     </label>
-    <br>
-    <br>
-    <label>Color Scheme:<br>
-    <input type="radio" name="colorScheme" value="gyr" checked> Green → Yellow → Red<br>
-    <input type="radio" name="colorScheme" value="ryg"> Red → Yellow → Green</label><br><br>
+    <br><br>
+    <label>
+      <h2>Color Scheme:</h2>
+      <input type="radio" name="colorScheme" value="gyr" checked> Green → Yellow → Red
+      <br>
+      <input type="radio" name="colorScheme" value="ryg"> Red → Yellow → Green
+    </label>
+    <br><br>
     <button onclick="goToMeter()">Submit</button>
   </div>
 
