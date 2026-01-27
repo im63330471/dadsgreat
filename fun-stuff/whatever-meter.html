@@ -46,7 +46,8 @@
     }
     .setupSubHeader {
       font-weight: bold;
-      margin: 0px;
+      margin-top: 20px;
+      margin-bottom: 0px;
     }
   </style>
 </head>
@@ -60,20 +61,17 @@
       <p class="setupSubHeader">Keyword (Noun):</p>
       <input type="text" id="keywordInput">
     </label>
-    <br><br>
     <label>
       <p class="setupSubHeader">Test Result:</p>
       <input type="range" id="resultSlider" min="0" max="101" value="50">
       <span id="sliderValue">50</span>%
     </label>
-    <br><br>
     <label>
       <p class="setupSubHeader">Color Scheme:</p>
       <input type="radio" name="colorScheme" value="gyr" checked> Green → Yellow → Red
       <br>
       <input type="radio" name="colorScheme" value="ryg"> Red → Yellow → Green
     </label>
-    <br><br>
     <button onclick="goToMeter()">Submit</button>
   </div>
 
