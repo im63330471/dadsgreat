@@ -38,16 +38,13 @@ row 2, run button, clear number, input box
     #maxChars {
       width: 10%;
     }
-    #okBtn, #testBtn, #clearBtn {
+    #okBtn, #clearBtn {
       height: 42px;
-      width: 25%;
+      width: 30%;
       color: white;
     }
     #okBtn {
       background-color: green;
-    }
-    #testBtn {
-      background-color: blue;
     }
     #clearBtn {
       background-color: red;
@@ -80,28 +77,22 @@ row 2, run button, clear number, input box
   <center>
     <input id="okBtn" type="button" value="OK">
     <input id="maxChars" type="number" min="1" value="29">
-    <input id="testBtn" type="button" value="Test">
     <input id="clearBtn" type="button" value="Clear">
   </center>
   <div id="qrResults"></div>
-  <div id="versionId">2026-1956</div>
+  <div id="versionId">2026-0128-1251</div>
 
   <script>
     const inputTextEl = document.getElementById('inputText');
     const maxCharsEl = document.getElementById('maxChars');
     const okBtn = document.getElementById('okBtn');
-    const testBtn = document.getElementById('testBtn');
     const clearBtn = document.getElementById('clearBtn');
     const qrResultsEl = document.getElementById('qrResults');
 
     function clearResults() {
       qrResultsEl.innerHTML = '';
     }
-
-    function dummyInput() {
-      inputTextEl.value = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent gravida venenatis cursus. Vivamus justo ligula, consequat eget luctus eu, posuere non enim. Nam porta quam sit amet est gravida, non vehicula mauris varius. Nam eu tellus metus.';
-    }
-
+    
     function generateChunks(text, size) {
       const chunks = [];
       for (let i = 0; i < text.length; i += size) {
@@ -152,7 +143,6 @@ row 2, run button, clear number, input box
     }
 
     okBtn.addEventListener('click', generateQRCodes);
-    testBtn.addEventListener('click', dummyInput);
     clearBtn.addEventListener('click', () => {
       clearResults();
       inputTextEl.value = '';
