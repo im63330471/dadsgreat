@@ -18,7 +18,7 @@ row 2, run button, clear number, input box
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>QR Code Maker B</title>
+  <title>QR Code Maker Mini</title>
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script> <!-- [web:1][web:4][web:7] -->
   <style>
     body {
@@ -30,7 +30,7 @@ row 2, run button, clear number, input box
       padding: 8px;
       font-size: 24px;
     }
-    input { /* buttons & number input */
+    input { /* buttons & max char input */
       display: inline-block;
       padding: 6px;
       font-size: 18px;
@@ -108,7 +108,7 @@ row 2, run button, clear number, input box
       clearResults();
 
       if (!text.length || !maxChars || maxChars <= 0) {
-        inputTextEl.value = ('Please enter text and a valid max characters value.');
+        inputTextEl.value = ('Please enter text & a valid max characters value.');
         return;
       }
 
