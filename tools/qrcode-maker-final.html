@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multi-line QR Code Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f8f9fa;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .input-area {
+      margin-bottom: 24px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .buttons {
+      margin: 16px 0;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      min-width: 120px;
+    }
+
+    #generateBtn {
+      background: #28a745;
+      color: white;
+    }
+
+    #generateBtn:hover {
+      background: #218838;
+    }
+
+    #clearBtn {
+      background: #dc3545;
+      color: white;
+    }
+
+    #clearBtn:hover {
+      background: #c82333;
+    }
+
+    .output-area {
+      display: grid;
+      gap: 28px 20px;
+    }
+
+    .qr-item {
+      text-align: center;
+    }
+
+    .qr-item canvas,
+    .qr-item img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .qr-label {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #444;
+      word-break: break-all;
+    }
+
+    /* Mobile first */
+    @media (min-width: 768px) {
+      .container {
+        display: flex;
+        gap: 32px;
+      }
+
+      .input-area {
+        flex: 0 0 32%;
+      }
+
+      .output-area {
+        flex: 1;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+
+      textarea {
+        min-height: 320px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .output-area {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="input-area">
+    <h2>Multi-line QR Generator</h2>
+    <textarea id="textInput" placeholder="Paste or type your text here...
+One line = one QR code" autofocus></textarea>
+
+    <div class="buttons">
+      <button id="generateBtn">Generate QR Codes</button>
+      <button id="clearBtn">Clear All</button>
+    </div>
+  </div>
+
+  <div class="output-area" id="qrOutput"></div>
+
+</div>
+
+<script>
+// ────────────────────────────────────────────────
+const textInput   = document.getElementById('textInput');
+const qrOutput    = document.getElementById('qrOutput');
+const generateBtn = document.getElementById('generateBtn');
+const clearBtn    = document.getElementById('clearBtn');
+
+function generateQRCodes() {
+  const text = textInput.value.trim();
+  qrOutput.innerHTML = '';
+
+  if (!text) {
+    qrOutput.innerHTML = '<p style="color:#666;">Please enter some text</p>';
+    return;
+  }
+
+  const lines = text.split('\n');
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    const item = document.createElement('div');
+    item.className = 'qr-item';
+
+    const qrDiv = document.createElement('div');
+    qrDiv.id = `qrcode-${index}`;
+
+    const label = document.createElement('div');
+    label.className = 'qr-label';
+    label.textContent = trimmed;
+
+    item.appendChild(qrDiv);
+    item.appendChild(label);
+    qrOutput.appendChild(item);
+
+    try {
+      new QRCode(qrDiv, {
+        text: trimmed,
+        width: 220,
+        height: 220,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H   // higher error correction
+      });
+    } catch (e) {
+      qrDiv.innerHTML = '<div style="color:red;padding:20px;">QR failed</div>';
+    }
+  });
+}
+
+function clearAll() {
+  textInput.value = '';
+  qrOutput.innerHTML = '';
+  textInput.focus();
+}
+
+// Events
+generateBtn.addEventListener('click', generateQRCodes);
+
+clearBtn.addEventListener('click', clearAll);
+
+// Optional: generate on Ctrl+Enter / Cmd+Enter
+textInput.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    generateQRCodes();
+  }
+});
+
+</script>
+</body>
+</html>
