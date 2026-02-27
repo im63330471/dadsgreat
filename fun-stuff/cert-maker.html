@@ -85,7 +85,7 @@
     <label>Child's Name: <input type="text" id="childName"></label><br><br>
     <label>Achievement: <input type="text" id="achievement"></label><br><br>
     <label>Date: <input type="date" id="date"></label><br><br>
-    <label>Photo URL: <input type="text" id="photoUrl" placeholder="https://..."></label><br><br>
+    <label>Photo: <input type="file" id="photoInput" accept="image/*" capture="camera"></label><br><br>
     <button type="button" onclick="generateCertificate()">Generate Certificate</button>
   </form>
 
@@ -119,12 +119,40 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
+    // Set default date to today
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+    // Load saved inputs from localStorage
+    window.onload = function() {
+      if(localStorage.getItem('childName')) {
+        document.getElementById('childName').value = localStorage.getItem('childName');
+        document.getElementById('achievement').value = localStorage.getItem('achievement');
+        document.getElementById('date').value = localStorage.getItem('date');
+      }
+    }
+
     function generateCertificate() {
-      document.getElementById('certName').innerText = document.getElementById('childName').value;
-      document.getElementById('certAchievement').innerText = 
-        "For outstanding performance in " + document.getElementById('achievement').value;
-      document.getElementById('certDate').innerText = document.getElementById('date').value;
-      document.getElementById('certPhoto').src = document.getElementById('photoUrl').value;
+      const name = document.getElementById('childName').value;
+      const achievement = document.getElementById('achievement').value;
+      const date = document.getElementById('date').value;
+      const photoInput = document.getElementById('photoInput').files[0];
+
+      document.getElementById('certName').innerText = name;
+      document.getElementById('certAchievement').innerText = "For outstanding performance in " + achievement;
+      document.getElementById('certDate').innerText = date;
+
+      if(photoInput) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('certPhoto').src = e.target.result;
+        }
+        reader.readAsDataURL(photoInput);
+      }
+
+      // Save inputs to localStorage
+      localStorage.setItem('childName', name);
+      localStorage.setItem('achievement', achievement);
+      localStorage.setItem('date', date);
     }
 
     function downloadImage() {
