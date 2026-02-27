@@ -31,11 +31,11 @@
     .certificate-content {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center; /* vertical centering */
     }
     .certificate-text {
       width: 60%;
-      text-align: left;
+      text-align: center; /* center text in column */
     }
     .certificate-text h2 {
       font-size: 1.5em;
@@ -53,29 +53,33 @@
     }
     .certificate-photo {
       width: 35%;
-      text-align: center;
+      display: flex;
+      justify-content: flex-start; /* align left */
+      align-items: center; /* vertical center */
     }
     .certificate-photo img {
-      max-width: 100%;
+      max-width: 50%; /* smaller size (about 1/4 of before) */
       border: 5px solid #ccc;
       border-radius: 10px;
     }
     .certificate-footer {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 80px; /* balanced spacing */
       margin-top: 40px;
       font-size: 1em;
       color: #555;
-    }
-    .buttons {
-      margin-top: 20px;
       text-align: center;
     }
-    .buttons button {
-      margin: 5px;
-      padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
+    .footer-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .footer-block .line {
+      width: 150px;
+      border-bottom: 1px solid #000;
+      margin-bottom: 5px;
     }
   </style>
 </head>
@@ -103,8 +107,15 @@
       </div>
     </div>
     <div class="certificate-footer">
-      <div id="certDate">[Date]</div>
-      <div>______________________ <br> Signature</div>
+      <div class="footer-block">
+        <div class="line"></div>
+        <div id="certDate">[Date]</div>
+        <div>Date</div>
+      </div>
+      <div class="footer-block">
+        <div class="line"></div>
+        <div>Signature</div>
+      </div>
     </div>
   </div>
 
