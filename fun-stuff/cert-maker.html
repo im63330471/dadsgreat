@@ -2,15 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Certificate of Achievement</title>
+  <title>Certificate Generator</title>
   <style>
     body {
       font-family: 'Fredoka', sans-serif;
       background: #fdf6e3;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
+      padding: 20px;
+    }
+    form {
+      margin-bottom: 20px;
     }
     .certificate {
       width: 800px;
@@ -18,47 +21,132 @@
       border: 10px solid #ffcc00;
       border-radius: 20px;
       background: #fff;
-      text-align: center;
       box-shadow: 0 0 20px rgba(0,0,0,0.2);
     }
     .certificate h1 {
+      text-align: center;
       font-size: 2.5em;
-      color: #333;
-      margin-bottom: 10px;
-    }
-    .certificate h2 {
-      font-size: 1.5em;
-      color: #555;
       margin-bottom: 20px;
     }
-    .certificate .name {
+    .certificate-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .certificate-text {
+      width: 60%;
+      text-align: left;
+    }
+    .certificate-text h2 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+    .certificate-text .name {
       font-size: 2em;
       font-weight: bold;
       color: #0077cc;
-      margin: 20px 0;
+      margin: 10px 0;
     }
-    .certificate .achievement {
+    .certificate-text .achievement {
       font-size: 1.2em;
-      margin: 20px 0;
+      margin: 10px 0;
     }
-    .certificate .footer {
+    .certificate-photo {
+      width: 35%;
+      text-align: center;
+    }
+    .certificate-photo img {
+      max-width: 100%;
+      border: 5px solid #ccc;
+      border-radius: 10px;
+    }
+    .certificate-footer {
+      display: flex;
+      justify-content: space-between;
       margin-top: 40px;
       font-size: 1em;
-      color: #777;
+      color: #555;
+    }
+    .buttons {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .buttons button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="certificate">
+  <!-- Input Form -->
+  <form id="certForm">
+    <label>Child's Name: <input type="text" id="childName"></label><br><br>
+    <label>Achievement: <input type="text" id="achievement"></label><br><br>
+    <label>Date: <input type="date" id="date"></label><br><br>
+    <label>Photo URL: <input type="text" id="photoUrl" placeholder="https://..."></label><br><br>
+    <button type="button" onclick="generateCertificate()">Generate Certificate</button>
+  </form>
+
+  <!-- Certificate -->
+  <div class="certificate" id="certificate">
     <h1>🏆 Certificate of Achievement 🏆</h1>
-    <h2>This certificate is proudly presented to</h2>
-    <div class="name">[Child's Name]</div>
-    <div class="achievement">For outstanding performance in [Achievement]</div>
-    <div class="footer">
-      Awarded on [Date] <br>
-      ______________________ <br>
-      Signature
+    <div class="certificate-content">
+      <div class="certificate-text">
+        <h2>This certificate is proudly presented to</h2>
+        <div class="name" id="certName">[Child's Name]</div>
+        <div class="achievement" id="certAchievement">For outstanding performance in [Achievement]</div>
+      </div>
+      <div class="certificate-photo">
+        <img id="certPhoto" src="" alt="Child's Photo">
+      </div>
+    </div>
+    <div class="certificate-footer">
+      <div id="certDate">[Date]</div>
+      <div>______________________ <br> Signature</div>
     </div>
   </div>
+
+  <!-- Action Buttons -->
+  <div class="buttons">
+    <button onclick="downloadImage()">Download as Image</button>
+    <button onclick="downloadPDF()">Download as PDF</button>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    function generateCertificate() {
+      document.getElementById('certName').innerText = document.getElementById('childName').value;
+      document.getElementById('certAchievement').innerText = 
+        "For outstanding performance in " + document.getElementById('achievement').value;
+      document.getElementById('certDate').innerText = document.getElementById('date').value;
+      document.getElementById('certPhoto').src = document.getElementById('photoUrl').value;
+    }
+
+    function downloadImage() {
+      html2canvas(document.getElementById("certificate")).then(canvas => {
+        let link = document.createElement("a");
+        link.download = "certificate.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById("certificate");
+      const opt = {
+        margin:       0.5,
+        filename:     'certificate.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
 </body>
 </html>
