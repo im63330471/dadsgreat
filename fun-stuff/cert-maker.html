@@ -16,10 +16,6 @@
     form {
       margin-bottom: 20px;
     }
-    #certContent {
-      display: grid;
-      place-items: center;
-    }
     .certificate {
       width: 90vw;
       max-width: 1123px;
@@ -30,17 +26,20 @@
       background: #fff;
       box-shadow: 0 0 20px rgba(0,0,0,0.2);
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
     }
     .certificate h1 {
       text-align: center;
       font-size: 2.5em;
       margin-top: 0;
-      margin-bottom: 20px;
+      margin-bottom: 12px; /* reduce gap below title */
     }
     .certificate-content {
       display: flex;
       justify-content: space-between;
       align-items: center; /* vertical centering */
+      flex: 0.65; /* reduce growth so header/footer sit closer to content */
       padding-left: 60px; /* more space on left */
       padding-right: 20px; /* less space on right */
     }
@@ -78,7 +77,7 @@
       justify-content: center;
       align-items: flex-end; /* align footer blocks to bottom */
       gap: 80px; /* balanced spacing */
-      margin-top: 40px;
+      margin-top: 18px; /* move footer closer to content */
       font-size: 1em;
       color: #555;
       text-align: center;
