@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Certificate Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC&family=LXGW+WenKai+Mono+TC&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Fredoka', sans-serif;
@@ -15,26 +16,36 @@
     form {
       margin-bottom: 20px;
     }
+    #certContent {
+      display: grid;
+      place-items: center;
+    }
     .certificate {
-      width: 800px;
-      padding: 40px;
+      width: 90vw;
+      max-width: 1123px;
+      aspect-ratio: 297 / 210; /* A4 landscape ratio */
+      padding: 30px;
       border: 10px solid #ffcc00;
       border-radius: 20px;
       background: #fff;
       box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      box-sizing: border-box;
     }
     .certificate h1 {
       text-align: center;
       font-size: 2.5em;
+      margin-top: 0;
       margin-bottom: 20px;
     }
     .certificate-content {
       display: flex;
       justify-content: space-between;
       align-items: center; /* vertical centering */
+      padding-left: 60px; /* more space on left */
+      padding-right: 20px; /* less space on right */
     }
     .certificate-text {
-      width: 60%;
+      width: 65%;
       text-align: center; /* center text in column */
     }
     .certificate-text h2 {
@@ -52,7 +63,7 @@
       margin: 10px 0;
     }
     .certificate-photo {
-      width: 35%;
+      width: 30%;
       display: flex;
       justify-content: flex-start; /* align left */
       align-items: center; /* vertical center */
@@ -65,6 +76,7 @@
     .certificate-footer {
       display: flex;
       justify-content: center;
+      align-items: flex-end; /* align footer blocks to bottom */
       gap: 80px; /* balanced spacing */
       margin-top: 40px;
       font-size: 1em;
@@ -75,11 +87,29 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-end; /* push children to bottom */
+    }
+    /* Ensure the top cell (date / signature) has equal height so the line sits level */
+    .footer-block > div:first-child {
+      min-height: 3.2em;
+      display: flex;
+      align-items: flex-end; /* align to bottom so underline lines match */
+      justify-content: center;
+      text-align: center;
     }
     .footer-block .line {
       width: 150px;
       border-bottom: 1px solid #000;
       margin-bottom: 5px;
+    }
+
+    /* Signature styling: calligraphy/traditional Chinese look */
+    #certSign {
+      font-family: 'LXGW WenKai Mono TC', 'LXGW WenKai TC', 'Noto Serif TC', 'DFKai-SB', serif;
+      font-size: 2.2rem;
+      color: #222;
+      line-height: 1;
+      margin-bottom: 0.1rem;
     }
   </style>
 </head>
@@ -96,6 +126,7 @@
   <!-- Certificate -->
   <div class="certificate" id="certificate">
     <h1>🏆 Certificate of Achievement 🏆</h1>
+
     <div class="certificate-content">
       <div class="certificate-text">
         <h2>This certificate is proudly presented to</h2>
@@ -106,13 +137,15 @@
         <img id="certPhoto" src="" alt="Child's Photo">
       </div>
     </div>
+
     <div class="certificate-footer">
       <div class="footer-block">
-        <div class="line"></div>
         <div id="certDate">[Date]</div>
+        <div class="line"></div>
         <div>Date</div>
       </div>
       <div class="footer-block">
+        <div id="certSign">陳蚓傑</div>
         <div class="line"></div>
         <div>Signature</div>
       </div>
@@ -130,8 +163,21 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) {
+        const d = new Date(dateStr);
+        if (isNaN(d)) return dateStr;
+        return `${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} ${d.getFullYear()}`;
+      }
+      const y = parts[0], m = Number(parts[1]), d = Number(parts[2]);
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return `${d} ${months[m-1]} ${y}`;
+    }
     // Set default date to today
     document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('certDate').innerText = formatDate(document.getElementById('date').value);
 
     // Load saved inputs from localStorage
     window.onload = function() {
@@ -139,6 +185,7 @@
         document.getElementById('childName').value = localStorage.getItem('childName');
         document.getElementById('achievement').value = localStorage.getItem('achievement');
         document.getElementById('date').value = localStorage.getItem('date');
+        document.getElementById('certDate').innerText = formatDate(localStorage.getItem('date'));
       }
     }
 
@@ -150,7 +197,7 @@
 
       document.getElementById('certName').innerText = name;
       document.getElementById('certAchievement').innerText = "For outstanding performance in " + achievement;
-      document.getElementById('certDate').innerText = date;
+      document.getElementById('certDate').innerText = formatDate(date);
 
       if(photoInput) {
         const reader = new FileReader();
@@ -182,7 +229,7 @@
         filename:     'certificate.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
       };
       html2pdf().set(opt).from(element).save();
     }
