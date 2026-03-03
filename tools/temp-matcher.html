@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Matrix Compare</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: black;
+        color: #0f0;
+        font-family: 'Courier New', monospace;
+        height: 100vh;
+        overflow-x: hidden;
+    }
+
+    .container {
+        position: relative;
+        z-index: 10;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+    }
+
+    .input-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    input[type="text"] {
+        background: #111;
+        color: #0f0;
+        border: 1px solid #0f0;
+        padding: 10px 14px;
+        font-family: monospace;
+        font-size: 16px;
+        width: 320px;
+        max-width: 90vw;
+    }
+
+    button {
+        background: #0f0;
+        color: black;
+        border: none;
+        padding: 12px 28px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    button:hover {
+        background: #0c0;
+    }
+
+    #resultTable {
+        background: rgba(0,0,0,0.85);
+        border-collapse: collapse;
+        margin-top: 30px;
+        font-size: 15px;
+        color: white;
+        z-index: 20;
+        position: relative;
+    }
+
+    #resultTable td, #resultTable th {
+        padding: 8px 14px;
+        border: none;
+        text-align: center;
+        min-width: 130px;
+    }
+
+    #resultTable th {
+        background: #111;
+        color: #0f8;
+    }
+
+    .yes { color: #0f0; font-weight: bold; }
+    .no  { color: #f00; animation: flashRed 1.2s infinite; }
+    .dup { color: #ff0; animation: flashYellow 1.4s infinite; }
+
+    @keyframes flashRed {
+        0%,100% { opacity: 1; }
+        50%     { opacity: 0.3; }
+    }
+
+    @keyframes flashYellow {
+        0%,100% { opacity: 1; }
+        50%     { opacity: 0.4; }
+    }
+
+    /* Matrix rain background */
+    canvas {
+        position: fixed;
+        top: 0; left: 0;
+        z-index: 1;
+        pointer-events: none;
+    }
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="container">
+    <div class="input-row">
+        <input type="text" id="inputA" placeholder="Input A (alphanumeric)">
+        <input type="text" id="inputB" placeholder="Input B (alphanumeric)">
+        <button id="buttonRun">Run</button>
+    </div>
+
+    <div id="resultTable"></div>
+</div>
+
+<script>
+// Matrix rain background
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+
+const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*';
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+
+const drops = Array(Math.floor(columns)).fill(1);
+
+function draw() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#0f0';
+    ctx.font = fontSize + 'px monospace';
+
+    for (let i = 0; i < drops.length; i++) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        // occasional color variation
+        if (Math.random() > 0.97) ctx.fillStyle = '#0ff';
+        else if (Math.random() > 0.94) ctx.fillStyle = '#f0f';
+        else ctx.fillStyle = '#0f0';
+
+        ctx.fillText(text, x, y);
+
+        if (y > canvas.height && Math.random() > 0.975)
+            drops[i] = 0;
+
+        drops[i]++;
+    }
+}
+
+setInterval(draw, 40);
+
+window.addEventListener('resize', () => {
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+});
+
+// Main logic
+document.getElementById('buttonRun').addEventListener('click', () => {
+    const a = document.getElementById('inputA').value.replace(/[^a-zA-Z0-9]/g, '');
+    const b = document.getElementById('inputB').value.replace(/[^a-zA-Z0-9]/g, '');
+
+    const arrayA = [];
+    const arrayB = [];
+
+    for (let i = 0; i < a.length; i += 13) {
+        const chunk = a.slice(i, i + 13);
+        if (chunk.length === 13) arrayA.push(chunk);
+    }
+
+    for (let i = 0; i < b.length; i += 13) {
+        const chunk = b.slice(i, i + 13);
+        if (chunk.length === 13) arrayB.push(chunk);
+    }
+
+    arrayA.sort();
+    arrayB.sort();
+
+    // Detect duplicates
+    const dupA = new Set(arrayA.filter((v, i) => arrayA.indexOf(v) !== i));
+    const dupB = new Set(arrayB.filter((v, i) => arrayB.indexOf(v) !== i));
+
+    const maxRows = Math.max(arrayA.length, arrayB.length);
+    let html = '<table id="resultTable"><tr><th>A</th><th>Status A</th><th></th><th>B</th><th>Status B</th></tr>';
+
+    for (let i = 0; i < maxRows; i++) {
+        const valA = i < arrayA.length ? arrayA[i] : '';
+        const valB = i < arrayB.length ? arrayB[i] : '';
+
+        let statusA = '';
+        let statusB = '';
+
+        if (i < arrayA.length) {
+            if (dupA.has(valA)) {
+                statusA = 'Dup';
+            } else {
+                statusA = arrayB.includes(valA) ? 'Yes' : 'No';
+            }
+        }
+
+        if (i < arrayB.length) {
+            if (dupB.has(valB)) {
+                statusB = 'Dup';
+            } else {
+                statusB = arrayA.includes(valB) ? 'Yes' : 'No';
+            }
+        }
+
+        html += `
+            <tr>
+                <td>${valA}</td>
+                <td class="${statusA === 'Yes' ? 'yes' : statusA === 'No' ? 'no' : statusA === 'Dup' ? 'dup' : ''}">${statusA}</td>
+                <td></td>
+                <td>${valB}</td>
+                <td class="${statusB === 'Yes' ? 'yes' : statusB === 'No' ? 'no' : statusB === 'Dup' ? 'dup' : ''}">${statusB}</td>
+            </tr>`;
+    }
+
+    html += '</table>';
+
+    document.getElementById('resultTable').innerHTML = html;
+});
+
+</script>
+</body>
+</html>
