@@ -80,18 +80,20 @@
         color: #0f8;
     }
 
-    .yes { color: #0f0; font-weight: bold; }
-    .no  { color: #f00; animation: flashRed 1.2s infinite; }
-    .dup { color: #ff0; animation: flashYellow 1.4s infinite; }
+    /* item present in other array */
+    .match { animation: flashGreen 1.4s infinite; }
 
-    @keyframes flashRed {
-        0%,100% { opacity: 1; }
-        50%     { opacity: 0.3; }
+    /* item not present in other array */
+    .nomatch { animation: flashRedFast 0.7s infinite; }
+
+    @keyframes flashGreen {
+        0%,100% { color: #0f0; }
+        50%     { color: #fff; }
     }
 
-    @keyframes flashYellow {
-        0%,100% { opacity: 1; }
-        50%     { opacity: 0.4; }
+    @keyframes flashRedFast {
+        0%,100% { color: #f00; }
+        50%     { color: #fff; }
     }
 
     /* Matrix rain background */
@@ -109,8 +111,8 @@
 
 <div class="container">
     <div class="input-row">
-        <input type="text" id="inputA" placeholder="Input A (alphanumeric)">
-        <input type="text" id="inputB" placeholder="Input B (alphanumeric)">
+        <input type="text" id="inputA" placeholder="Input A">
+        <input type="text" id="inputB" placeholder="Input B">
         <button id="buttonRun">Run</button>
     </div>
 
@@ -190,39 +192,34 @@ document.getElementById('buttonRun').addEventListener('click', () => {
     const dupB = new Set(arrayB.filter((v, i) => arrayB.indexOf(v) !== i));
 
     const maxRows = Math.max(arrayA.length, arrayB.length);
-    let html = '<table id="resultTable"><tr><th>A</th><th>Status A</th><th></th><th>B</th><th>Status B</th></tr>';
+    let html = '<table id="resultTable">';
 
     for (let i = 0; i < maxRows; i++) {
-        const valA = i < arrayA.length ? arrayA[i] : '';
-        const valB = i < arrayB.length ? arrayB[i] : '';
-
-        let statusA = '';
-        let statusB = '';
-
+        // prepare cellA
+        let cellA = '<td></td>';
         if (i < arrayA.length) {
-            if (dupA.has(valA)) {
-                statusA = 'Dup';
-            } else {
-                statusA = arrayB.includes(valA) ? 'Yes' : 'No';
+            let val = arrayA[i];
+            const isMatch = arrayB.includes(val);
+            const cls = isMatch ? 'match' : 'nomatch';
+            if (dupA.has(val)) {
+                val = 'dup ' + val;
             }
+            cellA = `<td class="${cls}">${val}</td>`;
         }
 
+        // prepare cellB
+        let cellB = '<td></td>';
         if (i < arrayB.length) {
-            if (dupB.has(valB)) {
-                statusB = 'Dup';
-            } else {
-                statusB = arrayA.includes(valB) ? 'Yes' : 'No';
+            let val = arrayB[i];
+            const isMatch = arrayA.includes(val);
+            const cls = isMatch ? 'match' : 'nomatch';
+            if (dupB.has(val)) {
+                val = 'dup ' + val;
             }
+            cellB = `<td class="${cls}">${val}</td>`;
         }
 
-        html += `
-            <tr>
-                <td>${valA}</td>
-                <td class="${statusA === 'Yes' ? 'yes' : statusA === 'No' ? 'no' : statusA === 'Dup' ? 'dup' : ''}">${statusA}</td>
-                <td></td>
-                <td>${valB}</td>
-                <td class="${statusB === 'Yes' ? 'yes' : statusB === 'No' ? 'no' : statusB === 'Dup' ? 'dup' : ''}">${statusB}</td>
-            </tr>`;
+        html += `<tr>${cellA}${cellB}</tr>`;
     }
 
     html += '</table>';
