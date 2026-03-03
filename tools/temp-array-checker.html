@@ -21,6 +21,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         padding: 40px 20px;
     }
 
@@ -33,9 +34,10 @@
     }
 
     input[type="text"] {
-        background: #111;
-        color: #0f0;
+        background: rgba(0,0,0,0.5);
+        color: #fff;
         border: 1px solid #0f0;
+        border-radius: 5px;
         padding: 10px 14px;
         font-family: monospace;
         font-size: 16px;
@@ -51,7 +53,7 @@
         font-size: 16px;
         font-weight: bold;
         cursor: pointer;
-        border-radius: 4px;
+        border-radius: 5px;
     }
 
     button:hover {
@@ -59,13 +61,15 @@
     }
 
     #resultTable {
-        background: rgba(0,0,0,0.85);
+        background: rgba(0,0,0,0.5);
         border-collapse: collapse;
+        border-radius: 5px;
         margin-top: 30px;
         font-size: 15px;
         color: white;
         z-index: 20;
         position: relative;
+        overflow: hidden;
     }
 
     #resultTable td, #resultTable th {
@@ -168,6 +172,10 @@ window.addEventListener('resize', () => {
 
 // Main logic
 document.getElementById('buttonRun').addEventListener('click', () => {
+    // Scroll input-row to top of screen
+    const inputRow = document.querySelector('.input-row');
+    inputRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
     const a = document.getElementById('inputA').value.replace(/[^a-zA-Z0-9]/g, '');
     const b = document.getElementById('inputB').value.replace(/[^a-zA-Z0-9]/g, '');
 
@@ -191,32 +199,52 @@ document.getElementById('buttonRun').addEventListener('click', () => {
     const dupA = new Set(arrayA.filter((v, i) => arrayA.indexOf(v) !== i));
     const dupB = new Set(arrayB.filter((v, i) => arrayB.indexOf(v) !== i));
 
-    const maxRows = Math.max(arrayA.length, arrayB.length);
+    // Separate items into nomatch and match for both arrays
+    const itemsA = [];
+    const itemsB = [];
+
+    for (let i = 0; i < arrayA.length; i++) {
+        let val = arrayA[i];
+        const isMatch = arrayB.includes(val);
+        const isDup = dupA.has(val);
+        itemsA.push({ val, isMatch, isDup, col: 'A' });
+    }
+
+    for (let i = 0; i < arrayB.length; i++) {
+        let val = arrayB[i];
+        const isMatch = arrayA.includes(val);
+        const isDup = dupB.has(val);
+        itemsB.push({ val, isMatch, isDup, col: 'B' });
+    }
+
+    // Sort by isMatch (false first = nomatch on top)
+    itemsA.sort((a, b) => a.isMatch - b.isMatch);
+    itemsB.sort((a, b) => a.isMatch - b.isMatch);
+
+    const maxRows = Math.max(itemsA.length, itemsB.length);
     let html = '<table id="resultTable">';
 
     for (let i = 0; i < maxRows; i++) {
-        // prepare cellA
         let cellA = '<td></td>';
-        if (i < arrayA.length) {
-            let val = arrayA[i];
-            const isMatch = arrayB.includes(val);
-            const cls = isMatch ? 'match' : 'nomatch';
-            if (dupA.has(val)) {
-                val = 'dup ' + val;
+        if (i < itemsA.length) {
+            const item = itemsA[i];
+            let displayVal = item.val;
+            if (item.isDup) {
+                displayVal = 'dup ' + displayVal;
             }
-            cellA = `<td class="${cls}">${val}</td>`;
+            const cls = item.isMatch ? 'match' : 'nomatch';
+            cellA = `<td class="${cls}">${displayVal}</td>`;
         }
 
-        // prepare cellB
         let cellB = '<td></td>';
-        if (i < arrayB.length) {
-            let val = arrayB[i];
-            const isMatch = arrayA.includes(val);
-            const cls = isMatch ? 'match' : 'nomatch';
-            if (dupB.has(val)) {
-                val = 'dup ' + val;
+        if (i < itemsB.length) {
+            const item = itemsB[i];
+            let displayVal = item.val;
+            if (item.isDup) {
+                displayVal = 'dup ' + displayVal;
             }
-            cellB = `<td class="${cls}">${val}</td>`;
+            const cls = item.isMatch ? 'match' : 'nomatch';
+            cellB = `<td class="${cls}">${displayVal}</td>`;
         }
 
         html += `<tr>${cellA}${cellB}</tr>`;
