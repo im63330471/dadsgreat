@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Word Counter</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f8f9fa;
+    }
+
+    .header {
+      height: 20%;
+      width: 100%;
+      background: #2c3e50;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      flex-shrink: 0;
+    }
+
+    #wordCount {
+      font-size: 2.1rem;
+      font-weight: bold;
+    }
+
+    #btnUpdate {
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #btnUpdate:hover {
+      background: #2980b9;
+    }
+
+    #btnUpdate:active {
+      background: #1f6391;
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      padding: 20px;
+      font-size: 1.1rem;
+      line-height: 1.5;
+      border: none;
+      resize: none;
+      background: white;
+      font-family: inherit;
+    }
+
+    textarea:focus {
+      outline: 3px solid #3498db;
+      outline-offset: -3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div id="wordCount">Words: 0</div>
+    <button id="btnUpdate">Update & Copy</button>
+  </div>
+
+  <textarea id="textInput" placeholder="Start typing here..."></textarea>
+
+  <script>
+    const textarea = document.getElementById('textInput');
+    const wordCountDisplay = document.getElementById('wordCount');
+    const btnUpdate = document.getElementById('btnUpdate');
+
+    // Load saved text from localStorage
+    const savedText = localStorage.getItem('wordcounter-text');
+    if (savedText) {
+      textarea.value = savedText;
+      updateWordCount(); // show count immediately on load
+    }
+
+    function countWords(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return 0;
+      return trimmed.split(/\s+/).length;
+    }
+
+    function updateWordCount() {
+      const count = countWords(textarea.value);
+      wordCountDisplay.textContent = `Words: ${count}`;
+    }
+
+    function saveAndUpdate() {
+      // Save to localStorage
+      localStorage.setItem('wordcounter-text', textarea.value);
+
+      // Update count
+      updateWordCount();
+
+      // Copy to clipboard
+      textarea.select();
+      textarea.setSelectionRange(0, 999999); // for mobile
+
+      navigator.clipboard.writeText(textarea.value)
+        .then(() => {
+          const originalText = btnUpdate.textContent;
+          btnUpdate.textContent = "Copied!";
+          btnUpdate.style.background = "#27ae60";
+          
+          setTimeout(() => {
+            btnUpdate.textContent = originalText;
+            btnUpdate.style.background = "#3498db";
+          }, 1400);
+        })
+        .catch(err => {
+          console.error("Clipboard copy failed:", err);
+          alert("Could not copy to clipboard");
+        });
+    }
+
+    // Button click
+    btnUpdate.addEventListener('click', saveAndUpdate);
+
+    // Optional: live count while typing (you can remove if unwanted)
+    // textarea.addEventListener('input', updateWordCount);
+  </script>
+
+</body>
+</html>
