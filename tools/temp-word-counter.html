@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Word Counter</title>
+  <title>Word & Character Counter</title>
   <style>
     * {
       margin: 0;
@@ -87,17 +87,31 @@
     const wordCountDisplay = document.getElementById('wordCount');
     const btnUpdate = document.getElementById('btnUpdate');
 
-    // Load saved text from localStorage
+    // Load saved text
     const savedText = localStorage.getItem('wordcounter-text');
     if (savedText) {
       textarea.value = savedText;
-      updateWordCount(); // show count immediately on load
+      updateWordCount();
     }
 
     function countWords(text) {
-      const trimmed = text.trim();
-      if (!trimmed) return 0;
-      return trimmed.split(/\s+/).length;
+      if (!text.trim()) return 0;
+
+      // Split on any whitespace (handles English + mixed text)
+      const tokens = text.trim().split(/\s+/);
+
+      let total = 0;
+
+      for (const token of tokens) {
+        // If the token contains CJK characters → count each char
+        if (/[\u4E00-\u9FFF\u3400-\u4DBF\uF900-\uFAFF\u3040-\u309F\u30A0-\u30FF]/.test(token)) {
+          total += token.length;  // each hanzi/kana = 1 "word"
+        } else {
+          total += 1;             // normal word (English, number, etc.)
+        }
+      }
+
+      return total;
     }
 
     function updateWordCount() {
@@ -106,37 +120,36 @@
     }
 
     function saveAndUpdate() {
-      // Save to localStorage
+      // 1. Save
       localStorage.setItem('wordcounter-text', textarea.value);
 
-      // Update count
+      // 2. Update display
       updateWordCount();
 
-      // Copy to clipboard
+      // 3. Copy
       textarea.select();
-      textarea.setSelectionRange(0, 999999); // for mobile
+      textarea.setSelectionRange(0, 999999);
 
       navigator.clipboard.writeText(textarea.value)
         .then(() => {
           const originalText = btnUpdate.textContent;
           btnUpdate.textContent = "Copied!";
           btnUpdate.style.background = "#27ae60";
-          
+
           setTimeout(() => {
             btnUpdate.textContent = originalText;
             btnUpdate.style.background = "#3498db";
           }, 1400);
         })
         .catch(err => {
-          console.error("Clipboard copy failed:", err);
+          console.error("Copy failed", err);
           alert("Could not copy to clipboard");
         });
     }
 
-    // Button click
     btnUpdate.addEventListener('click', saveAndUpdate);
 
-    // Optional: live count while typing (you can remove if unwanted)
+    // Optional: live update while typing (uncomment if desired)
     // textarea.addEventListener('input', updateWordCount);
   </script>
 
