@@ -6,7 +6,7 @@
     <title>💰 Kiddo Bank</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&amp;family=Fredoka:wght@400;700&amp;display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Fredoka:wght@400;600;700&display=swap');
         
         body {
             font-family: 'Fredoka', system-ui, sans-serif;
@@ -17,7 +17,7 @@
         }
 
         .coin {
-            animation: coin-spin 3s linear infinite;
+            animation: coin-spin 4s linear infinite;
         }
 
         @keyframes coin-spin {
@@ -26,135 +26,93 @@
         }
 
         .screen {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s ease;
         }
 
         .big-button {
-            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transition: all 0.15s ease;
         }
         
         .big-button:active {
-            transform: scale(0.92) translateY(2px);
+            transform: scale(0.96);
         }
 
         .balance-number {
             font-variant-numeric: tabular-nums;
         }
+
+        /* Prevent overly huge elements on small screens */
+        @media (max-width: 360px) {
+            h1 { font-size: 2rem; }
+            .text-6xl { font-size: 3.5rem; }
+            .text-5xl { font-size: 2.8rem; }
+            .text-4xl { font-size: 2rem; }
+            .py-7, .py-8 { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-sky-300 via-purple-300 to-pink-300 min-h-screen overflow-hidden">
-    <!-- SETUP SCREEN -->
-    <div id="setup-screen" class="screen flex flex-col min-h-screen items-center justify-center p-6">
-        <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
-            <!-- header -->
-            <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-8 text-center">
-                <div class="flex justify-center mb-3">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-5xl shadow-inner coin">💰</div>
-                </div>
-                <h1 class="title-font text-4xl font-bold tracking-tight">Kiddo Bank</h1>
-                <p class="text-purple-100 mt-1 text-lg">Let's set up your account!</p>
-            </div>
+<body class="bg-gradient-to-br from-sky-200 via-purple-200 to-pink-200 min-h-screen overflow-hidden">
 
-            <div class="p-8 space-y-8">
-                <!-- name -->
-                <div>
-                    <label class="block text-sm font-bold text-purple-600 mb-2 tracking-widest">YOUR NAME</label>
-                    <input id="account-name" 
-                           type="text" 
-                           placeholder="Super Saver 🦸‍♂️"
-                           class="w-full px-6 py-5 text-2xl border-4 border-purple-200 rounded-2xl focus:border-purple-500 focus:outline-none transition-all">
-                </div>
-
-                <!-- balance -->
-                <div>
-                    <label class="block text-sm font-bold text-purple-600 mb-2 tracking-widest">STARTING BALANCE</label>
-                    <div class="relative">
-                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-3xl text-purple-400">$</span>
-                        <input id="initial-balance" 
-                               type="number" 
-                               step="1"
-                               min="0"
-                               value="50"
-                               class="w-full pl-12 pr-6 py-5 text-4xl border-4 border-purple-200 rounded-2xl focus:border-purple-500 focus:outline-none transition-all">
-                    </div>
-                </div>
-
-                <!-- OK button -->
-                <button onclick="saveSetup()"
-                        class="big-button w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white py-6 rounded-3xl text-3xl font-bold shadow-xl flex items-center justify-center gap-3">
-                    <span>✅ SAVE &amp; START</span>
-                </button>
-
-                <p class="text-center text-purple-400 text-sm">All data saved on your phone only</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ACCOUNT SCREEN -->
-    <div id="account-screen" class="screen hidden flex flex-col min-h-screen">
+    <!-- ACCOUNT SCREEN (now default layout) -->
+    <div id="account-screen" class="screen flex flex-col min-h-screen">
         <!-- top bar -->
-        <div class="bg-white shadow-md px-6 py-4 flex items-center justify-between">
-            <div onclick="resetAccount()" 
-                 class="flex items-center gap-2 text-purple-500 text-sm font-bold cursor-pointer">
-                <span>🔄</span>
-                <span>NEW ACCOUNT</span>
+        <div class="bg-white/90 backdrop-blur-sm shadow px-4 py-3 flex items-center justify-between">
+            <div onclick="resetAccount()" class="flex items-center gap-2 text-purple-600 text-xs font-bold cursor-pointer active:opacity-70">
+                <span>🔄</span> Reset
             </div>
             <div class="flex items-center gap-2">
-                <div class="text-2xl">💰</div>
-                <div id="display-name" 
-                     class="title-font text-2xl font-bold text-purple-700"></div>
+                <div class="text-xl">💰</div>
+                <div id="display-name" class="title-font text-xl font-bold text-purple-700 truncate max-w-[180px]"></div>
             </div>
         </div>
 
         <!-- balance card -->
-        <div class="px-6 pt-8 pb-4">
-            <div class="bg-white rounded-3xl shadow-xl p-8 text-center">
-                <div class="text-emerald-600 text-sm font-bold tracking-widest mb-1">YOUR BALANCE</div>
+        <div class="px-5 pt-6 pb-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
+                <div class="text-emerald-600 text-xs font-bold tracking-wide mb-1">YOUR BALANCE</div>
                 <div class="flex items-center justify-center gap-1">
-                    <span class="text-6xl text-emerald-600">$</span>
-                    <span id="display-balance" 
-                          class="balance-number text-7xl font-bold text-emerald-700">0</span>
+                    <span class="text-5xl text-emerald-600 font-light">$</span>
+                    <span id="display-balance" class="balance-number text-6xl font-bold text-emerald-700">0</span>
                 </div>
             </div>
         </div>
 
         <!-- transfer section -->
-        <div class="flex-1 px-6">
-            <div class="bg-white rounded-3xl shadow-xl p-6 h-full flex flex-col">
-                <div class="text-center mb-6">
-                    <div class="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-5 py-2 rounded-2xl text-sm font-bold">
-                        <span>📤</span>
-                        <span>LOG MONEY OUT</span>
+        <div class="flex-1 px-5 pb-4 flex flex-col">
+            <div class="bg-white rounded-2xl shadow-lg p-5 flex flex-col flex-1">
+                <div class="text-center mb-4">
+                    <div class="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-1.5 rounded-xl text-xs font-bold">
+                        <span>📤</span> SPEND / LOG OUT
                     </div>
                 </div>
 
                 <!-- amount buttons -->
-                <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="grid grid-cols-2 gap-4 mb-5">
                     <button onclick="addToTransfer(10)"
-                            class="big-button bg-gradient-to-br from-yellow-300 to-amber-400 hover:brightness-110 text-amber-900 py-8 rounded-3xl text-4xl font-bold shadow-lg flex flex-col items-center gap-1">
-                        <span class="text-5xl">💵</span>
+                            class="big-button bg-gradient-to-br from-yellow-300 to-amber-400 text-amber-900 py-10 rounded-2xl text-3xl font-bold shadow-md flex flex-col items-center justify-center active:brightness-95">
+                        <span class="text-4xl mb-1">💵</span>
                         +$10
                     </button>
                     
                     <button onclick="addToTransfer(1)"
-                            class="big-button bg-gradient-to-br from-blue-300 to-cyan-400 hover:brightness-110 text-cyan-900 py-8 rounded-3xl text-4xl font-bold shadow-lg flex flex-col items-center gap-1">
-                        <span class="text-5xl">🪙</span>
+                            class="big-button bg-gradient-to-br from-blue-300 to-cyan-400 text-cyan-900 py-10 rounded-2xl text-3xl font-bold shadow-md flex flex-col items-center justify-center active:brightness-95">
+                        <span class="text-4xl mb-1">🪙</span>
                         +$1
                     </button>
                 </div>
 
-                <!-- transfer display (hidden until >0) -->
-                <div id="transfer-display" class="hidden bg-red-50 border-4 border-red-300 rounded-3xl p-6 mb-6">
+                <!-- transfer display -->
+                <div id="transfer-display" class="hidden bg-red-50 border-2 border-red-300 rounded-2xl p-4 mb-4">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-3">
-                            <div class="text-4xl">📤</div>
+                            <div class="text-3xl">📤</div>
                             <div>
-                                <div class="text-red-500 text-xs font-bold tracking-widest">TRANSFER OUT</div>
-                                <div id="transfer-amount" class="text-5xl font-bold text-red-600">0</div>
+                                <div class="text-red-600 text-xs font-bold tracking-wide">AMOUNT</div>
+                                <div id="transfer-amount" class="text-4xl font-bold text-red-700">$0</div>
                             </div>
                         </div>
                         <button onclick="clearTransfer()"
-                                class="px-6 py-3 bg-white border-2 border-red-300 rounded-2xl text-red-500 font-bold text-sm active:bg-red-100">
+                                class="px-5 py-2 bg-white border-2 border-red-300 rounded-xl text-red-600 text-sm font-bold active:bg-red-50">
                             CLEAR
                         </button>
                     </div>
@@ -163,38 +121,68 @@
                 <!-- confirm button -->
                 <button id="confirm-btn"
                         onclick="confirmTransfer()"
-                        class="hidden big-button w-full bg-gradient-to-r from-red-500 to-rose-600 text-white py-7 rounded-3xl text-3xl font-bold shadow-2xl flex items-center justify-center gap-3">
-                    <span>✅ CONFIRM DEDUCTION</span>
+                        class="hidden big-button w-full bg-gradient-to-r from-red-500 to-rose-600 text-white py-5 rounded-2xl text-2xl font-bold shadow-xl flex items-center justify-center gap-2 active:brightness-90">
+                    <span>✅ CONFIRM</span>
                 </button>
 
                 <!-- transaction statement -->
-                <div id="statement-area" class="hidden mt-auto bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-sm">
-                    <div class="text-emerald-600 font-bold mb-2">✅ TRANSACTION RECORDED</div>
-                    <div id="statement-text" class="font-mono text-emerald-700 text-lg"></div>
+                <div id="statement-area" class="hidden mt-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-sm">
+                    <div class="text-emerald-700 font-bold mb-1 text-center">Transaction Done!</div>
+                    <div id="statement-text" class="font-mono text-base text-center"></div>
                 </div>
             </div>
         </div>
 
-        <!-- footer tip -->
-        <div class="text-center py-6 text-purple-400 text-xs">
-            Press buttons to add up what you want to spend<br>
-            Then tap CONFIRM
+        <div class="text-center py-4 text-purple-500/70 text-xs px-5">
+            Tap coins to add up • then tap CONFIRM
+        </div>
+    </div>
+
+    <!-- SETUP SCREEN (kept mostly same, just slightly compacted) -->
+    <div id="setup-screen" class="screen hidden flex flex-col min-h-screen items-center justify-center p-5">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 text-center">
+                <div class="flex justify-center mb-2">
+                    <div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center text-4xl shadow-inner coin">💰</div>
+                </div>
+                <h1 class="title-font text-3xl font-bold">Kiddo Bank</h1>
+                <p class="text-purple-100 mt-1">Set up your pocket money!</p>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-purple-600 mb-2 tracking-wide">NAME</label>
+                    <input id="account-name" type="text" placeholder="Super Kid 🦸" 
+                           class="w-full px-4 py-4 text-xl border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-purple-600 mb-2 tracking-wide">STARTING MONEY</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-purple-400">$</span>
+                        <input id="initial-balance" type="number" step="1" min="0" value="50"
+                               class="w-full pl-10 pr-4 py-4 text-3xl border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none">
+                    </div>
+                </div>
+
+                <button onclick="saveSetup()"
+                        class="big-button w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white py-5 rounded-2xl text-2xl font-bold shadow-lg flex items-center justify-center gap-2 active:brightness-95">
+                    ✅ SAVE & START
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Tailwind script already loaded
         let accountData = null
         let transferAmount = 0
 
         function saveToStorage() {
-            if (accountData) {
-                localStorage.setItem('kiddoBank', JSON.stringify(accountData))
-            }
+            if (accountData) localStorage.setItem('kiddoBank', JSON.stringify(accountData))
         }
 
         function loadFromStorage() {
-            const saved = localStorage.getItem('kiddoBank')
+            const saved = localStorage.getItem('kidboBank')
             if (saved) {
                 accountData = JSON.parse(saved)
                 return true
@@ -202,46 +190,44 @@
             return false
         }
 
-        function showSetupScreen() {
+        function showSetup() {
             document.getElementById('setup-screen').classList.remove('hidden')
             document.getElementById('account-screen').classList.add('hidden')
         }
 
-        function showAccountScreen() {
+        function showAccount() {
             document.getElementById('setup-screen').classList.add('hidden')
             document.getElementById('account-screen').classList.remove('hidden')
             
-            // populate data
             document.getElementById('display-name').textContent = accountData.name
-            updateBalanceDisplay()
+            updateBalance()
             clearTransfer()
         }
 
-        function updateBalanceDisplay() {
-            const balEl = document.getElementById('display-balance')
-            balEl.textContent = parseFloat(accountData.balance).toFixed(0)
-            // subtle animation
-            balEl.classList.add('scale-110')
-            setTimeout(() => balEl.classList.remove('scale-110'), 300)
+        function updateBalance() {
+            const el = document.getElementById('display-balance')
+            el.textContent = Math.floor(accountData.balance)
+            el.classList.add('scale-105')
+            setTimeout(() => el.classList.remove('scale-105'), 250)
         }
 
         function updateTransferUI() {
-            const displayDiv = document.getElementById('transfer-display')
-            const confirmBtn = document.getElementById('confirm-btn')
-            const amountEl = document.getElementById('transfer-amount')
+            const disp = document.getElementById('transfer-display')
+            const btn = document.getElementById('confirm-btn')
+            const amt = document.getElementById('transfer-amount')
 
             if (transferAmount > 0) {
-                displayDiv.classList.remove('hidden')
-                amountEl.textContent = transferAmount
-                confirmBtn.classList.remove('hidden')
+                disp.classList.remove('hidden')
+                btn.classList.remove('hidden')
+                amt.textContent = '$' + transferAmount
             } else {
-                displayDiv.classList.add('hidden')
-                confirmBtn.classList.add('hidden')
+                disp.classList.add('hidden')
+                btn.classList.add('hidden')
             }
         }
 
-        function addToTransfer(value) {
-            transferAmount += value
+        function addToTransfer(v) {
+            transferAmount += v
             updateTransferUI()
         }
 
@@ -253,101 +239,66 @@
         function confirmTransfer() {
             if (transferAmount <= 0) return
 
-            const oldBalance = parseFloat(accountData.balance)
-            const newBalance = Math.max(0, oldBalance - transferAmount)   // never go negative for kids
+            const old = accountData.balance
+            const spent = transferAmount
+            const neu = Math.max(0, old - spent)
 
-            // show statement
-            const statementEl = document.getElementById('statement-text')
-            statementEl.innerHTML = `
-                <span class="text-emerald-600">$${oldBalance}</span> 
-                <span class="text-red-400">- $${transferAmount}</span> 
-                <span class="text-emerald-700">= $${newBalance}</span>
-            `
+            document.getElementById('statement-text').innerHTML = 
+                `<span class="text-emerald-600">$${old}</span> - <span class="text-red-500">$${spent}</span> = <span class="text-emerald-700 font-bold">$${neu}</span>`
             document.getElementById('statement-area').classList.remove('hidden')
 
-            // update balance
-            accountData.balance = newBalance
+            accountData.balance = neu
             saveToStorage()
-            updateBalanceDisplay()
+            updateBalance()
 
-            // reset transfer
-            const oldTransfer = transferAmount
             transferAmount = 0
             updateTransferUI()
 
-            // auto-hide statement after 4 seconds
             setTimeout(() => {
                 document.getElementById('statement-area').classList.add('hidden')
-            }, 4000)
+            }, 3500)
 
-            // fun confetti effect (simple)
-            createSimpleConfetti()
-        }
-
-        function createSimpleConfetti() {
-            for (let i = 0; i < 30; i++) {
+            // tiny confetti
+            for (let i = 0; i < 12; i++) {
                 setTimeout(() => {
-                    const confetti = document.createElement('div')
-                    confetti.textContent = ['💰','🪙','⭐','🌈'][Math.floor(Math.random()*4)]
-                    confetti.style.position = 'fixed'
-                    confetti.style.left = Math.random() * 100 + 'vw'
-                    confetti.style.top = '-20px'
-                    confetti.style.fontSize = '20px'
-                    confetti.style.zIndex = '9999'
-                    confetti.style.transition = 'all 2s cubic-bezier(0.4, 0, 1, 1)'
-                    document.body.appendChild(confetti)
-                    
+                    const c = document.createElement('div')
+                    c.textContent = '🪙⭐💰'[i%3]
+                    c.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:-20px;font-size:18px;z-index:9999;`
+                    document.body.appendChild(c)
                     setTimeout(() => {
-                        confetti.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random()*800 - 400}deg)`
-                        confetti.style.opacity = '0'
-                    }, 50)
-                    
-                    setTimeout(() => confetti.remove(), 2500)
-                }, i * 8)
+                        c.style.transform = `translateY(${window.innerHeight+50}px) rotate(${Math.random()*600-300}deg)`
+                        c.style.opacity = '0'
+                    }, 30)
+                    setTimeout(() => c.remove(), 1800)
+                }, i * 40)
             }
         }
 
         function saveSetup() {
-            const nameInput = document.getElementById('account-name').value.trim()
-            let balanceInput = parseFloat(document.getElementById('initial-balance').value)
+            const name = document.getElementById('account-name').value.trim() || "Kiddo"
+            let bal = parseFloat(document.getElementById('initial-balance').value) || 0
+            if (bal < 0) bal = 0
 
-            if (!nameInput) {
-                alert("😊 Please give your account a fun name!")
-                return
-            }
-            if (isNaN(balanceInput) || balanceInput < 0) {
-                balanceInput = 0
-            }
-
-            accountData = {
-                name: nameInput || "Super Saver",
-                balance: balanceInput
-            }
-
+            accountData = { name, balance: bal }
             saveToStorage()
-            showAccountScreen()
+            showAccount()
         }
 
         function resetAccount() {
-            if (confirm("Start completely fresh? All money will be reset!")) {
+            if (confirm("Reset everything? Money will be gone!")) {
                 localStorage.removeItem('kiddoBank')
                 location.reload()
             }
         }
 
-        // INIT
-        function initializeApp() {
-            // Tailwind ready
+        // Start
+        window.addEventListener('load', () => {
             if (loadFromStorage()) {
-                showAccountScreen()
+                showAccount()
             } else {
-                showSetupScreen()
+                showSetup()
             }
-        }
-
-        // Start the app
-        window.onload = initializeApp
-    </script>
-    2045
+        })
+    </script>2100
 </body>
 </html>
