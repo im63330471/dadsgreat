@@ -41,24 +41,22 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* Prevent overly huge elements on small screens */
         @media (max-width: 360px) {
             h1 { font-size: 2rem; }
             .text-6xl { font-size: 3.5rem; }
             .text-5xl { font-size: 2.8rem; }
             .text-4xl { font-size: 2rem; }
-            .py-7, .py-8 { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
         }
     </style>
 </head>
 <body class="bg-gradient-to-br from-sky-200 via-purple-200 to-pink-200 min-h-screen overflow-hidden">
 
-    <!-- ACCOUNT SCREEN (now default layout) -->
+    <!-- ACCOUNT SCREEN -->
     <div id="account-screen" class="screen flex flex-col min-h-screen">
-        <!-- top bar -->
         <div class="bg-white/90 backdrop-blur-sm shadow px-4 py-3 flex items-center justify-between">
-            <div onclick="resetAccount()" class="flex items-center gap-2 text-purple-600 text-xs font-bold cursor-pointer active:opacity-70">
-                <span>🔄</span> Reset
+            <div onclick="openAddMoneyScreen()" 
+                 class="flex items-center gap-2 text-green-600 text-sm font-bold cursor-pointer active:opacity-70">
+                 <span>➕</span> Add Money
             </div>
             <div class="flex items-center gap-2">
                 <div class="text-xl">💰</div>
@@ -66,10 +64,9 @@
             </div>
         </div>
 
-        <!-- balance card -->
         <div class="px-5 pt-6 pb-4">
             <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
-                <div class="text-emerald-600 text-xs font-bold tracking-wide mb-1">YOUR BALANCE</div>
+                <div class="text-emerald-600 text-xs font-bold tracking-wide mb-1">CURRENT BALANCE</div>
                 <div class="flex items-center justify-center gap-1">
                     <span class="text-5xl text-emerald-600 font-light">$</span>
                     <span id="display-balance" class="balance-number text-6xl font-bold text-emerald-700">0</span>
@@ -77,7 +74,6 @@
             </div>
         </div>
 
-        <!-- transfer section -->
         <div class="flex-1 px-5 pb-4 flex flex-col">
             <div class="bg-white rounded-2xl shadow-lg p-5 flex flex-col flex-1">
                 <div class="text-center mb-4">
@@ -86,7 +82,6 @@
                     </div>
                 </div>
 
-                <!-- amount buttons -->
                 <div class="grid grid-cols-2 gap-4 mb-5">
                     <button onclick="addToTransfer(10)"
                             class="big-button bg-gradient-to-br from-yellow-300 to-amber-400 text-amber-900 py-10 rounded-2xl text-3xl font-bold shadow-md flex flex-col items-center justify-center active:brightness-95">
@@ -101,7 +96,6 @@
                     </button>
                 </div>
 
-                <!-- transfer display -->
                 <div id="transfer-display" class="hidden bg-red-50 border-2 border-red-300 rounded-2xl p-4 mb-4">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-3">
@@ -118,27 +112,65 @@
                     </div>
                 </div>
 
-                <!-- confirm button -->
                 <button id="confirm-btn"
                         onclick="confirmTransfer()"
                         class="hidden big-button w-full bg-gradient-to-r from-red-500 to-rose-600 text-white py-5 rounded-2xl text-2xl font-bold shadow-xl flex items-center justify-center gap-2 active:brightness-90">
-                    <span>✅ CONFIRM</span>
+                    <span>✅ CONFIRM SPEND</span>
                 </button>
 
-                <!-- transaction statement -->
                 <div id="statement-area" class="hidden mt-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-sm">
-                    <div class="text-emerald-700 font-bold mb-1 text-center">Transaction Done!</div>
+                    <div class="text-emerald-700 font-bold mb-1 text-center">Transaction Recorded</div>
                     <div id="statement-text" class="font-mono text-base text-center"></div>
                 </div>
             </div>
         </div>
 
         <div class="text-center py-4 text-purple-500/70 text-xs px-5">
-            Tap coins to add up • then tap CONFIRM
+            Tap coins to add up what was spent • then CONFIRM
         </div>
     </div>
 
-    <!-- SETUP SCREEN (kept mostly same, just slightly compacted) -->
+    <!-- ADD MONEY / SETUP SCREEN -->
+    <div id="add-money-screen" class="screen hidden flex flex-col min-h-screen items-center justify-center p-5">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 text-center">
+                <div class="flex justify-center mb-2">
+                    <div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center text-4xl shadow-inner coin">💰</div>
+                </div>
+                <h1 class="title-font text-3xl font-bold">Add Money</h1>
+                <p id="add-money-subtitle" class="text-green-100 mt-1">Top up [Name]'s account</p>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-green-700 mb-2 tracking-wide">Child's Name</label>
+                    <input id="account-name" type="text" disabled
+                           class="w-full px-4 py-4 text-xl border-2 border-green-200 rounded-xl bg-gray-100 cursor-not-allowed">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-green-700 mb-2 tracking-wide">Amount to ADD</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-green-400">$</span>
+                        <input id="add-amount" type="number" step="1" min="0" value="0"
+                               class="w-full pl-10 pr-4 py-4 text-3xl border-2 border-green-200 rounded-xl focus:border-green-500 outline-none">
+                    </div>
+                </div>
+
+                <button onclick="confirmAddMoney()"
+                        class="big-button w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white py-5 rounded-2xl text-2xl font-bold shadow-lg flex items-center justify-center gap-2 active:brightness-95">
+                    ✅ ADD MONEY
+                </button>
+
+                <button onclick="cancelAddMoney()"
+                        class="w-full text-gray-600 py-3 text-lg font-medium active:opacity-70">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIRST-TIME SETUP SCREEN (only shown if no name exists) -->
     <div id="setup-screen" class="screen hidden flex flex-col min-h-screen items-center justify-center p-5">
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
             <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 text-center">
@@ -146,159 +178,178 @@
                     <div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center text-4xl shadow-inner coin">💰</div>
                 </div>
                 <h1 class="title-font text-3xl font-bold">Kiddo Bank</h1>
-                <p class="text-purple-100 mt-1">Set up your pocket money!</p>
+                <p class="text-purple-100 mt-1">Set up your child's account</p>
             </div>
 
             <div class="p-6 space-y-6">
                 <div>
-                    <label class="block text-sm font-bold text-purple-600 mb-2 tracking-wide">NAME</label>
-                    <input id="account-name" type="text" placeholder="Super Kid 🦸" 
+                    <label class="block text-sm font-bold text-purple-600 mb-2 tracking-wide">Child's Name</label>
+                    <input id="setup-name" type="text" placeholder="Super Kid 🦸" 
                            class="w-full px-4 py-4 text-xl border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-purple-600 mb-2 tracking-wide">STARTING MONEY</label>
+                    <label class="block text-sm font-bold text-purple-600 mb-2 tracking-wide">Starting Balance</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-purple-400">$</span>
-                        <input id="initial-balance" type="number" step="1" min="0" value="50"
+                        <input id="setup-balance" type="number" step="1" min="0" value="0"
                                class="w-full pl-10 pr-4 py-4 text-3xl border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none">
                     </div>
                 </div>
 
-                <button onclick="saveSetup()"
+                <button onclick="saveFirstSetup()"
                         class="big-button w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white py-5 rounded-2xl text-2xl font-bold shadow-lg flex items-center justify-center gap-2 active:brightness-95">
-                    ✅ SAVE & START
+                    ✅ CREATE ACCOUNT
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        let accountData = null
-        let transferAmount = 0
+        let accountData = { name: "", balance: 0 };
+        let transferAmount = 0;
+        const STORAGE_KEY = 'kiddoBankData';
 
         function saveToStorage() {
-            if (accountData) localStorage.setItem('kiddoBank', JSON.stringify(accountData))
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(accountData));
         }
 
         function loadFromStorage() {
-            const saved = localStorage.getItem('kidboBank')
+            const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
-                accountData = JSON.parse(saved)
-                return true
+                accountData = JSON.parse(saved);
+                return true;
             }
-            return false
-        }
-
-        function showSetup() {
-            document.getElementById('setup-screen').classList.remove('hidden')
-            document.getElementById('account-screen').classList.add('hidden')
+            return false;
         }
 
         function showAccount() {
-            document.getElementById('setup-screen').classList.add('hidden')
-            document.getElementById('account-screen').classList.remove('hidden')
-            
-            document.getElementById('display-name').textContent = accountData.name
-            updateBalance()
-            clearTransfer()
+            document.getElementById('account-screen').classList.remove('hidden');
+            document.getElementById('add-money-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.add('hidden');
+
+            document.getElementById('display-name').textContent = accountData.name || "Kiddo";
+            updateBalance();
+            clearTransfer();
         }
 
         function updateBalance() {
-            const el = document.getElementById('display-balance')
-            el.textContent = Math.floor(accountData.balance)
-            el.classList.add('scale-105')
-            setTimeout(() => el.classList.remove('scale-105'), 250)
+            const el = document.getElementById('display-balance');
+            el.textContent = Math.floor(accountData.balance || 0);
+            el.classList.add('scale-105');
+            setTimeout(() => el.classList.remove('scale-105'), 250);
         }
 
-        function updateTransferUI() {
-            const disp = document.getElementById('transfer-display')
-            const btn = document.getElementById('confirm-btn')
-            const amt = document.getElementById('transfer-amount')
+        function openAddMoneyScreen() {
+            document.getElementById('account-screen').classList.add('hidden');
+            document.getElementById('add-money-screen').classList.remove('hidden');
 
-            if (transferAmount > 0) {
-                disp.classList.remove('hidden')
-                btn.classList.remove('hidden')
-                amt.textContent = '$' + transferAmount
-            } else {
-                disp.classList.add('hidden')
-                btn.classList.add('hidden')
+            document.getElementById('account-name').value = accountData.name;
+            document.getElementById('add-amount').value = "0";
+            document.getElementById('add-money-subtitle').textContent = 
+                `Top up ${accountData.name}'s account`;
+        }
+
+        function cancelAddMoney() {
+            document.getElementById('add-money-screen').classList.add('hidden');
+            showAccount();
+        }
+
+        function confirmAddMoney() {
+            let amount = parseFloat(document.getElementById('add-amount').value) || 0;
+            if (amount <= 0) {
+                alert("Please enter an amount greater than 0.");
+                return;
             }
+
+            accountData.balance += amount;
+            saveToStorage();
+            updateBalance();
+
+            // Simple success feedback
+            const msg = document.createElement('div');
+            msg.textContent = `+$${amount} added!`;
+            msg.style.cssText = 'position:fixed; top:30%; left:50%; transform:translate(-50%,-50%); background:#10b981; color:white; padding:1.5rem 2.5rem; border-radius:1rem; font-size:1.5rem; font-weight:bold; z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.3);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 1800);
+
+            cancelAddMoney();
+        }
+
+        function saveFirstSetup() {
+            const name = document.getElementById('setup-name').value.trim();
+            if (!name) {
+                alert("Please enter the child's name.");
+                return;
+            }
+
+            let bal = parseFloat(document.getElementById('setup-balance').value) || 0;
+            if (bal < 0) bal = 0;
+
+            accountData.name = name;
+            accountData.balance = bal;
+            saveToStorage();
+            showAccount();
         }
 
         function addToTransfer(v) {
-            transferAmount += v
-            updateTransferUI()
+            transferAmount += v;
+            updateTransferUI();
         }
 
         function clearTransfer() {
-            transferAmount = 0
-            updateTransferUI()
+            transferAmount = 0;
+            updateTransferUI();
+        }
+
+        function updateTransferUI() {
+            const disp = document.getElementById('transfer-display');
+            const btn = document.getElementById('confirm-btn');
+            const amt = document.getElementById('transfer-amount');
+
+            if (transferAmount > 0) {
+                disp.classList.remove('hidden');
+                btn.classList.remove('hidden');
+                amt.textContent = '$' + transferAmount;
+            } else {
+                disp.classList.add('hidden');
+                btn.classList.add('hidden');
+            }
         }
 
         function confirmTransfer() {
-            if (transferAmount <= 0) return
+            if (transferAmount <= 0) return;
 
-            const old = accountData.balance
-            const spent = transferAmount
-            const neu = Math.max(0, old - spent)
+            const old = accountData.balance;
+            const spent = transferAmount;
+            const neu = Math.max(0, old - spent);
 
             document.getElementById('statement-text').innerHTML = 
-                `<span class="text-emerald-600">$${old}</span> - <span class="text-red-500">$${spent}</span> = <span class="text-emerald-700 font-bold">$${neu}</span>`
-            document.getElementById('statement-area').classList.remove('hidden')
+                `<span class="text-emerald-600">$${old}</span> - <span class="text-red-500">$${spent}</span> = <span class="text-emerald-700 font-bold">$${neu}</span>`;
+            document.getElementById('statement-area').classList.remove('hidden');
 
-            accountData.balance = neu
-            saveToStorage()
-            updateBalance()
+            accountData.balance = neu;
+            saveToStorage();
+            updateBalance();
 
-            transferAmount = 0
-            updateTransferUI()
+            transferAmount = 0;
+            updateTransferUI();
 
             setTimeout(() => {
-                document.getElementById('statement-area').classList.add('hidden')
-            }, 3500)
-
-            // tiny confetti
-            for (let i = 0; i < 12; i++) {
-                setTimeout(() => {
-                    const c = document.createElement('div')
-                    c.textContent = '🪙⭐💰'[i%3]
-                    c.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:-20px;font-size:18px;z-index:9999;`
-                    document.body.appendChild(c)
-                    setTimeout(() => {
-                        c.style.transform = `translateY(${window.innerHeight+50}px) rotate(${Math.random()*600-300}deg)`
-                        c.style.opacity = '0'
-                    }, 30)
-                    setTimeout(() => c.remove(), 1800)
-                }, i * 40)
-            }
+                document.getElementById('statement-area').classList.add('hidden');
+            }, 3500);
         }
 
-        function saveSetup() {
-            const name = document.getElementById('account-name').value.trim() || "Kiddo"
-            let bal = parseFloat(document.getElementById('initial-balance').value) || 0
-            if (bal < 0) bal = 0
-
-            accountData = { name, balance: bal }
-            saveToStorage()
-            showAccount()
-        }
-
-        function resetAccount() {
-            if (confirm("Reset everything? Money will be gone!")) {
-                localStorage.removeItem('kiddoBank')
-                location.reload()
-            }
-        }
-
-        // Start
+        // Initialize
         window.addEventListener('load', () => {
-            if (loadFromStorage()) {
-                showAccount()
+            const hasData = loadFromStorage();
+
+            if (hasData && accountData.name) {
+                showAccount();
             } else {
-                showSetup()
+                document.getElementById('setup-screen').classList.remove('hidden');
             }
-        })
+        });
     </script>
 </body>
 </html>
