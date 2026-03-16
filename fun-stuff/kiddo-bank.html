@@ -39,7 +39,7 @@
     <div class="bg-white/90 backdrop-blur-sm shadow px-4 py-3 flex items-center justify-between">
       <div onclick="addMoney()" 
            class="flex items-center gap-2 text-green-600 text-sm font-bold cursor-pointer active:opacity-70">
-        <span>➕</span> Add Money
+        <span>➕/−</span> Add / Deduct
       </div>
       <div class="flex items-center gap-2">
         <div class="text-xl">💰</div>
@@ -126,7 +126,7 @@
           <label class="block text-sm font-bold text-purple-600 mb-2 tracking-wide">Starting Balance</label>
           <div class="relative">
             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-purple-400">$</span>
-            <input id="setup-balance" type="number" step="1" min="0" value="0" class="w-full pl-10 pr-4 py-4 text-3xl border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none">
+            <input id="setup-balance" type="number" step="0.01" min="0" value="0" class="w-full pl-10 pr-4 py-4 text-3xl border-2 border-purple-200 rounded-xl focus:border-purple-500 outline-none">
           </div>
         </div>
         <button onclick="saveFirstSetup()" class="big-button w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white py-5 rounded-2xl text-2xl font-bold shadow-lg flex items-center justify-center gap-2 active:brightness-95">
@@ -149,6 +149,8 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         accountData = JSON.parse(saved);
+        // Ensure balance is a number
+        accountData.balance = Number(accountData.balance) || 0;
         return true;
       }
       return false;
@@ -158,39 +160,58 @@
       document.getElementById('account-screen').classList.remove('hidden');
       document.getElementById('setup-screen').classList.add('hidden');
       document.getElementById('display-name').textContent = accountData.name || "Kiddo";
-      updateBalance();
+      updateBalanceDisplay();
       clearTransfer();
     }
 
-    function updateBalance() {
+    function updateBalanceDisplay() {
       const el = document.getElementById('display-balance');
-      el.textContent = Math.floor(accountData.balance || 0);
+      const val = accountData.balance;
+      el.textContent = Number.isInteger(val) ? val : val.toFixed(2);
       el.classList.add('scale-105');
       setTimeout(() => el.classList.remove('scale-105'), 250);
     }
 
-    // ─── Add Money via prompt ───────────────────────────────────────
+    // ─── Add / Deduct Money via prompt ───────────────────────────────
     function addMoney() {
-      const amountStr = prompt(`Add money to ${accountData.name}'s account\n\nHow much? (e.g. 50, 100)`);
+      const msg = `Current balance: $${accountData.balance.toFixed(2)}\n\n` +
+                  `Enter amount to add (positive) or deduct (negative):\n` +
+                  `You can use decimals (e.g. 12.5, -3.75, 0)`;
+
+      const amountStr = prompt(msg);
       if (amountStr === null) return; // cancelled
 
-      const amount = parseFloat(amountStr);
-      if (isNaN(amount) || amount <= 0) {
-        alert("Please enter a positive number.");
+      const amount = Number(amountStr);
+      if (isNaN(amount)) {
+        alert("That's not a valid number.");
         return;
       }
 
-      if (confirm(`Add $${amount} to ${accountData.name}'s balance?\n\nNew balance will be $${accountData.balance + amount}`)) {
-        accountData.balance += amount;
+      if (amount === 0) {
+        alert("Amount is zero — no change made.");
+        return;
+      }
+
+      const action = amount > 0 ? "add" : "deduct";
+      const absAmount = Math.abs(amount);
+      const newBalance = accountData.balance + amount;
+
+      if (confirm(`Are you sure you want to ${action} $${absAmount.toFixed(2)}?\n\n` +
+                   `New balance: $${newBalance.toFixed(2)}`)) {
+        accountData.balance = newBalance;
         saveToStorage();
-        updateBalance();
+        updateBalanceDisplay();
 
         // success feedback
-        const msg = document.createElement('div');
-        msg.textContent = `+$${amount} added!`;
-        msg.style.cssText = 'position:fixed; top:30%; left:50%; transform:translate(-50%,-50%); background:#10b981; color:white; padding:1.5rem 2.5rem; border-radius:1rem; font-size:1.5rem; font-weight:bold; z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.3);';
-        document.body.appendChild(msg);
-        setTimeout(() => msg.remove(), 1800);
+        const sign = amount > 0 ? "+" : "−";
+        const msgEl = document.createElement('div');
+        msgEl.textContent = `${sign}$${absAmount.toFixed(2)}`;
+        msgEl.style.cssText = 'position:fixed; top:30%; left:50%; transform:translate(-50%,-50%); ' +
+                             `background:${amount>0?'#10b981':'#ef4444'}; color:white; ` +
+                             'padding:1.5rem 2.5rem; border-radius:1rem; font-size:1.8rem; font-weight:bold; ' +
+                             'z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.3);';
+        document.body.appendChild(msgEl);
+        setTimeout(() => msgEl.remove(), 1800);
       }
     }
 
@@ -217,8 +238,7 @@
         alert("Please enter the child's name.");
         return;
       }
-      let bal = parseFloat(document.getElementById('setup-balance').value) || 0;
-      if (bal < 0) bal = 0;
+      let bal = Number(document.getElementById('setup-balance').value) || 0;
 
       accountData.name = name;
       accountData.balance = bal;
@@ -241,10 +261,11 @@
       const btn = document.getElementById('confirm-btn');
       const amt = document.getElementById('transfer-amount');
 
-      if (transferAmount > 0) {
+      if (transferAmount !== 0) {   // allow negative if you ever add subtract buttons later
         disp.classList.remove('hidden');
         btn.classList.remove('hidden');
-        amt.textContent = '$' + transferAmount;
+        const sign = transferAmount > 0 ? '+' : '';
+        amt.textContent = sign + transferAmount.toFixed(0);
       } else {
         disp.classList.add('hidden');
         btn.classList.add('hidden');
@@ -252,18 +273,18 @@
     }
 
     function confirmTransfer() {
-      if (transferAmount <= 0) return;
+      if (transferAmount === 0) return;
       const old = accountData.balance;
       const spent = transferAmount;
       const neu = Math.max(0, old - spent);
 
       document.getElementById('statement-text').innerHTML = 
-        `<span class="text-emerald-600">$${old}</span> - <span class="text-red-500">$${spent}</span> = <span class="text-emerald-700 font-bold">$${neu}</span>`;
+        `<span class="text-emerald-600">$${old.toFixed(2)}</span> − <span class="text-red-500">$${spent.toFixed(0)}</span> = <span class="text-emerald-700 font-bold">$${neu.toFixed(2)}</span>`;
       document.getElementById('statement-area').classList.remove('hidden');
 
       accountData.balance = neu;
       saveToStorage();
-      updateBalance();
+      updateBalanceDisplay();
 
       transferAmount = 0;
       updateTransferUI();
