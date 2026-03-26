@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Centered Rotating Egg</title>
+  <title>Rotating Egg</title>
   <style>
     body { background: #222; }
     canvas { display: block; margin: 50px auto; background: #fff; }
@@ -19,20 +19,16 @@
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
 
-  // Egg center position (canvas center)
-  const eggCenterX = canvasWidth / 2;
-  const eggCenterY = canvasHeight / 2;
-
-  // Rotation center relative to egg bounding box
-  const rotationOffsetX = eggWidth / 2; // 10 left + 10 right means centered horizontally
-  const rotationOffsetY = 13.5;         // 13.5 from top
-  // Adjust so it's also 12 from bottom: eggHeight - 12 = 243, average with 13.5 gives ~128.25
-  const rotationCenterY = eggHeight / 2; // balanced vertically
+  // Rotation center (custom offsets)
+  const rotationCenterX = 10 + eggWidth / 2;   // 10 from left/right
+  const rotationCenterY = 13.5 + (eggHeight - 12 - 13.5) / 2; 
+  // 13.5 from top, 12 from bottom
 
   let angle = 0;
 
   function drawEgg() {
     ctx.beginPath();
+    // Egg shape using ellipse
     ctx.ellipse(0, 0, eggWidth/2, eggHeight/2, 0, 0, 2 * Math.PI);
     ctx.fillStyle = "#f5deb3";
     ctx.fill();
@@ -44,20 +40,16 @@
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
     ctx.save();
-    // Move to egg center
-    ctx.translate(eggCenterX, eggCenterY);
-
-    // Apply rotation around custom offset
-    ctx.translate(rotationOffsetX - eggWidth/2, rotationOffsetY - eggHeight/2);
+    // Move to rotation center
+    ctx.translate(rotationCenterX, rotationCenterY);
     ctx.rotate(angle);
-    ctx.translate(-(rotationOffsetX - eggWidth/2), -(rotationOffsetY - eggHeight/2));
 
-    // Draw egg centered
+    // Draw egg centered at rotation point
     drawEgg();
 
     ctx.restore();
 
-    angle += 0.01; // rotation speed
+    angle += 0.1; // rotation speed
     requestAnimationFrame(animate);
   }
 
