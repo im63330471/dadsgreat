@@ -1,7 +1,23 @@
+<!-- OVERVIEW
+Collection RPG game, move around, encounter knowledge creatures, answer question,
+capture, add to inventory and view.
+ -->
+
+<!-- FEATURES
+- start screen, continue mode or guest mode
+- music
+
+- generated map
+- creature images & sounds
+- maximum of 3 attempts, keep correct prefix of wrong answers
+- inventory of caught creatures, view details
+-->
+
 <!doctype html>
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <title>Knowledge Hunter RPG</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -16,6 +32,18 @@
         </table>
       </div>
       <div id="status">Steps: <span id="steps">0</span></div>
+    </div>
+  </div>
+
+  <!-- touch / virtual controls -->
+  <div id="touchControls" aria-hidden="false">
+    <div id="dpad">
+      <button id="btnUp" class="dbtn">▲</button>
+      <div class="drow">
+        <button id="btnLeft" class="dbtn">◀</button>
+        <button id="btnDown" class="dbtn">▼</button>
+        <button id="btnRight" class="dbtn">▶</button>
+      </div>
     </div>
   </div>
 

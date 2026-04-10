@@ -131,6 +131,19 @@
     if(k==='ArrowRight'||k==='d'||k==='D') move(1,0);
   });
 
+  // virtual / touch controls
+  try {
+    const btnUp = document.getElementById('btnUp');
+    const btnDown = document.getElementById('btnDown');
+    const btnLeft = document.getElementById('btnLeft');
+    const btnRight = document.getElementById('btnRight');
+    function hook(btn, fn){ if(!btn) return; btn.addEventListener('click', fn); btn.addEventListener('touchstart', e=>{ e.preventDefault(); fn(); }); }
+    hook(btnUp, ()=>{ if(!inEncounter) move(0,-1); });
+    hook(btnDown, ()=>{ if(!inEncounter) move(0,1); });
+    hook(btnLeft, ()=>{ if(!inEncounter) move(-1,0); });
+    hook(btnRight, ()=>{ if(!inEncounter) move(1,0); });
+  } catch(e) { /* ignore missing controls */ }
+
   // init
   renderInv(); makeMap(); draw();
   } catch(err) {
