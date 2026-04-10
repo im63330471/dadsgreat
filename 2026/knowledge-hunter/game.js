@@ -7,7 +7,6 @@
 
   const invTable = document.getElementById('invTable');
   const invTbody = invTable ? invTable.querySelector('tbody') : null;
-  const stepsEl = document.getElementById('steps');
   const encounterEl = document.getElementById('encounter');
   const creatureNameEl = document.getElementById('creatureName');
   const answerInput = document.getElementById('answerInput');
@@ -39,8 +38,7 @@
   let inventory = JSON.parse(localStorage.getItem('kh_inv')||'[]');
   let map = [];
   let player = {x: Math.floor(cols/2), y: Math.floor(rows/2)};
-  let steps = 0;
-  let bushStreak = 0;
+  let bushCount = 0;
 
   let inEncounter = null; // {creature, attemptsLeft, answer}
 
@@ -48,15 +46,19 @@
   function renderInv(){
     if(!invTbody) return;
     invTbody.innerHTML = '';
-    // build rows ordered by creature id; show name only (blank when uncaught)
     const byId = creatures.slice().sort((a,b)=> (a.id||0)-(b.id||0));
     byId.forEach(c=>{
       const tr = document.createElement('tr');
-      const td = document.createElement('td');
+      const tdImg = document.createElement('td');
+      const tdName = document.createElement('td'); tdName.className = 'name';
       const caught = inventory.find(x=>x.id === c.id);
-      if(caught){ td.textContent = caught.name; td.style.cursor = 'pointer'; td.addEventListener('click', ()=> openViewer(caught)); }
-      else { td.textContent = ''; }
-      tr.appendChild(td);
+      const img = document.createElement('img');
+      if(caught && caught.image){ img.src = caught.image; img.alt = caught.name || '' } else { img.style.visibility='hidden' }
+      tdImg.appendChild(img);
+      if(caught){ tdName.textContent = caught.name; tdName.style.cursor = 'pointer'; tdName.addEventListener('click', ()=> openViewer(caught)); }
+      else { tdName.textContent = ''; }
+      tr.appendChild(tdImg);
+      tr.appendChild(tdName);
       invTbody.appendChild(tr);
     });
   }
@@ -79,9 +81,13 @@
     ctx.fillStyle='#d83a3a'; ctx.fillRect(player.x*tile+4, player.y*tile+4, tile-8, tile-8);
   }
 
-  function move(dx,dy){ if(inEncounter) return; const nx=player.x+dx, ny=player.y+dy; if(nx<0||ny<0||nx>=cols||ny>=rows) return; player.x=nx; player.y=ny; steps++; stepsEl.textContent=steps; if(map[player.y][player.x]===1){ bushStreak++ } else { bushStreak=0 }
-    // fixed threshold: 3 consecutive bush steps trigger an encounter
-    if(bushStreak>=3){ triggerEncounter(); bushStreak=0 }
+  function move(dx,dy){
+    if(inEncounter) return;
+    const nx=player.x+dx, ny=player.y+dy;
+    if(nx<0||ny<0||nx>=cols||ny>=rows) return;
+    player.x=nx; player.y=ny;
+    if(map[player.y][player.x]===1){ bushCount++ }
+    if(bushCount>=3){ triggerEncounter(); bushCount=0 }
     draw();
   }
 

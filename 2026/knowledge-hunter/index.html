@@ -31,7 +31,17 @@ capture, add to inventory and view.
           <tbody></tbody>
         </table>
       </div>
-      <div id="status">Steps: <span id="steps">0</span></div>
+      <!-- touch / virtual controls placed inside UI so landscape can show them under inventory -->
+      <div id="touchControls" aria-hidden="false">
+        <div id="dpad">
+          <button id="btnUp" class="dbtn">▲</button>
+          <div class="drow">
+            <button id="btnLeft" class="dbtn">◀</button>
+            <button id="btnDown" class="dbtn">▼</button>
+            <button id="btnRight" class="dbtn">▶</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
