@@ -23,8 +23,30 @@ canvas{image-rendering:pixelated;border:4px solid #2c5a2c;background:#7cc06b;dis
 
 #encImage, #viewImage{border:2px solid #ddd;border-radius:6px;max-height:50vh;width:auto;max-width:100%;height:auto}
 #viewer.hidden{display:none}
-#viewer{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center}
+#viewer{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999}
 #viewer .modal{min-width:360px}
+
+.catchEffect{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.catchBall{position:absolute;left:50%;top:50%;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #fff 15%, #f9dd5f 35%, #f18900 100%);box-shadow:0 0 0 5px rgba(255,255,255,.75),0 10px 18px rgba(0,0,0,.18);transform:translate(-50%,120px) scale(0.6);opacity:0}
+.gotcha{position:absolute;top:50%;left:100%;transform:translateX(0) translateY(-50%);font-size:44px;font-style:italic;font-weight:900;color:#000;opacity:0;text-shadow:none;white-space:nowrap}
+#encImage.capture-target{animation:capture-shrink 0.8s ease-in forwards}
+.catchEffect.active .catchBall{animation:ball-throw 0.8s cubic-bezier(.25,.8,.25,1) forwards, ball-wiggle 0.25s ease-in-out 0.85s forwards}
+.catchEffect.active .gotcha.animate{animation:gotcha-slide 1.8s ease forwards}
+
+@keyframes ball-throw{0%{transform:translate(-50%,120px) scale(0.75) rotate(-10deg);opacity:0}
+50%{transform:translate(-50%,20px) scale(1.1) rotate(10deg);opacity:1}
+100%{transform:translate(-50%,-12px) scale(0.9) rotate(0deg);opacity:1}}
+@keyframes ball-wiggle{0%{transform:translate(-50%,-12px) scale(0.95) rotate(0deg)}
+25%{transform:translate(-50%,-12px) scale(0.95) rotate(-12deg)}
+50%{transform:translate(-50%,-12px) scale(0.95) rotate(10deg)}
+75%{transform:translate(-50%,-12px) scale(0.95) rotate(-6deg)}
+100%{transform:translate(-50%,-12px) scale(0.95) rotate(0deg)}}
+@keyframes capture-shrink{0%{transform:translateY(0) scale(1);opacity:1}
+100%{transform:translateY(18px) scale(0.28);opacity:.2}}
+@keyframes gotcha-slide{0%{opacity:0;left:100%;transform:translateX(0) translateY(-50%)}
+25%{opacity:1;left:50%;transform:translateX(-50%) translateY(-50%)}
+65%{opacity:1;left:50%;transform:translateX(-50%) translateY(-50%)}
+100%{opacity:0;left:50%;transform:translateX(-50%) translateY(-50%)}}
 
 /* simple controls hint */
 body:after{content:"Move: Arrow keys / WASD";position:fixed;left:12px;bottom:8px;background:rgba(255,255,255,0.8);padding:6px;border-radius:6px;font-size:12px}
