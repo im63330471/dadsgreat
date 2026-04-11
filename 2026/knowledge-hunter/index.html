@@ -27,9 +27,11 @@ capture, add to inventory and view.
     <div id="ui">
       <div id="inventory">
         <h3>Inventory</h3>
-        <table id="invTable">
-          <tbody></tbody>
-        </table>
+        <div class="invScroll">
+          <table id="invTable">
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
       <!-- touch / virtual controls placed inside UI so landscape can show them under inventory -->
       <div id="touchControls" aria-hidden="false">
@@ -41,18 +43,6 @@ capture, add to inventory and view.
             <button id="btnRight" class="dbtn">▶</button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- touch / virtual controls -->
-  <div id="touchControls" aria-hidden="false">
-    <div id="dpad">
-      <button id="btnUp" class="dbtn">▲</button>
-      <div class="drow">
-        <button id="btnLeft" class="dbtn">◀</button>
-        <button id="btnDown" class="dbtn">▼</button>
-        <button id="btnRight" class="dbtn">▶</button>
       </div>
     </div>
   </div>
