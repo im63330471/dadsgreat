@@ -30,7 +30,7 @@ canvas{image-rendering:pixelated;border:4px solid #2c5a2c;background:#7cc06b;dis
 body:after{content:"Move: Arrow keys / WASD";position:fixed;left:12px;bottom:8px;background:rgba(255,255,255,0.8);padding:6px;border-radius:6px;font-size:12px}
 
 /* touch / virtual controls */
-#touchControls{position:fixed;z-index:40;pointer-events:auto;right:12px;bottom:12px}
+#touchControls{position:static;z-index:40;pointer-events:auto}
 #dpad{display:flex;flex-direction:column;align-items:center;gap:6px}
 .drow{display:flex;gap:6px}
 .dbtn{width:56px;height:56px;border-radius:8px;border:2px solid rgba(0,0,0,0.15);background:rgba(255,255,255,0.95);font-size:20px}
@@ -41,8 +41,8 @@ body:after{content:"Move: Arrow keys / WASD";position:fixed;left:12px;bottom:8px
 	#map{width:100%;height:50vh}
 	#ui{display:flex;flex-direction:row;gap:8px;height:calc(50vh - 8px)}
 	#inventory{width:50%;max-height:100%;overflow:auto}
-	/* keep touch controls fixed bottom-right in portrait */
-	#touchControls{position:fixed;right:12px;bottom:12px}
+	/* place touch controls in the remaining right area and center them */
+	#touchControls{position:static;flex:1;display:flex;justify-content:center;align-items:center}
 	#dpad{transform:translateY(0)}
 }
 
@@ -52,6 +52,6 @@ body:after{content:"Move: Arrow keys / WASD";position:fixed;left:12px;bottom:8px
 	#map{flex:1;height:100%}
 	#ui{width:320px;display:flex;flex-direction:column;gap:12px}
 	#inventory{width:100%;max-height:60vh;overflow:auto}
-	/* show touch controls under inventory inside the UI column */
-	#touchControls{position:static;margin-top:8px;align-self:flex-start}
+	/* show touch controls under inventory inside the UI column and center them */
+	#touchControls{position:static;margin-top:8px;align-self:center;display:flex;justify-content:center;width:100%}
 }
