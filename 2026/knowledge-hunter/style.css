@@ -6,7 +6,7 @@ html,body{height:100%;margin:0;font-family:sans-serif;background:#88c070}
 canvas{image-rendering:pixelated;border:4px solid #2c5a2c;background:#7cc06b;display:block}
 #ui{color:#083a09}
 #inventory{background:rgba(255,255,255,0.9);padding:8px;border-radius:6px;width:220px;display:flex;flex-direction:column}
-#inventory h3{margin:0 0 8px 0;font-size:16px;flex:0}
+#inventory h3{margin:0 0 8px 0;font-size:16px;flex:0;display:flex;align-items:center;justify-content:space-between}
 #invTable{width:100%;border-collapse:collapse;background:rgba(255,255,255,0.95);border-radius:6px}
 #invTable td{padding:6px;font-size:13px;border-bottom:1px solid #e6f5e6;vertical-align:middle}
 #invTable td.name{padding-left:8px}
@@ -20,6 +20,11 @@ canvas{image-rendering:pixelated;border:4px solid #2c5a2c;background:#7cc06b;dis
 .buttons{display:flex;gap:8px}
 .buttons button{flex:1;padding:8px}
 .secondary{background:#eee}
+
+/* small icon-style button used in headers */
+.icon-btn{background:transparent;border:none;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:18px;line-height:1}
+.icon-btn:hover{background:rgba(0,0,0,0.04)}
+.icon-btn:active{transform:translateY(1px)}
 
 #encImage, #viewImage{border:2px solid #ddd;border-radius:6px;max-height:50vh;width:auto;max-width:100%;height:auto}
 #viewer.hidden{display:none}

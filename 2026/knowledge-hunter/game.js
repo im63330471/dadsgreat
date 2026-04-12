@@ -26,6 +26,7 @@
   const viewId = document.getElementById('viewId');
   const viewDesc = document.getElementById('viewDesc');
   const closeViewer = document.getElementById('closeViewer');
+  const clearBtn = document.getElementById('clearStorage');
 
   // Creature list: season, id, display name, expected answer, description, image, and sound
   const creatures = [
@@ -82,6 +83,18 @@
       tr.appendChild(tdImg);
       tr.appendChild(tdName);
       invTbody.appendChild(tr);
+    });
+  }
+
+  // Clear saved inventory handler (clear localStorage key 'kh_inv')
+  if (typeof clearBtn !== 'undefined' && clearBtn) {
+    clearBtn.addEventListener('click', ()=>{
+      if(!confirm('Clear inventory?')) return;
+      localStorage.removeItem('kh_inv');
+      inventory = [];
+      saveInv();
+      renderInv();
+      try{ alert('Inventory cleared.'); }catch(e){}
     });
   }
 
