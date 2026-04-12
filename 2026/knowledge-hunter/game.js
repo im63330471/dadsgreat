@@ -5,8 +5,10 @@
   const ctx = canvas.getContext('2d');
   const tile = 32; const cols = canvas.width / tile; const rows = canvas.height / tile;
 
+  // HTML elements for inventory, encounter modal, and answer input
   const invTable = document.getElementById('invTable');
   const invTbody = invTable ? invTable.querySelector('tbody') : null;
+  const inventoryEl = document.getElementById('inventory');
   const encounterEl = document.getElementById('encounter');
   const creatureNameEl = document.getElementById('creatureName');
   const answerInput = document.getElementById('answerInput');
@@ -15,6 +17,8 @@
   const runBtn = document.getElementById('runAway');
   const encImage = document.getElementById('encImage');
   const encPrompt = document.getElementById('encPrompt');
+  const catchEffect = document.getElementById('catchEffect');
+  // viewer elements for creature details after capture
   const viewer = document.getElementById('viewer');
   const viewName = document.getElementById('viewName');
   const viewImage = document.getElementById('viewImage');
@@ -23,6 +27,7 @@
   const viewDesc = document.getElementById('viewDesc');
   const closeViewer = document.getElementById('closeViewer');
 
+  // Creature list: season, id, display name, expected answer, description, image, and sound
   const creatures = [
     {season: 'ver01', id: 1, name:'shoes', answer:'shoes', description: 'An external covering for the foot.', image:'v01-shoes.jpg', sound:'v01-shoes.flac'},
     {season: 'ver01', id: 2, name:'robot', answer:'robot', description: 'A machine to follow designed instructions.', image:'v01-robot.jpg', sound:'v01-robot.flac'},
@@ -33,16 +38,21 @@
   ];
 
   // percentage of map tiles that become bushes (tune this to increase/decrease bush area)
-  const bushDensity = 0.4; // 0.4 -> ~40% of tiles
+  const bushDensity = 0.5; // 0.5 -> ~50% of tiles
 
+  // Game state stored in memory
   let inventory = JSON.parse(localStorage.getItem('kh_inv')||'[]');
   let map = [];
   let player = {x: Math.floor(cols/2), y: Math.floor(rows/2)};
   let bushCount = 0;
 
+  // Current encounter info while the player is trying to catch a creature
   let inEncounter = null; // {creature, attemptsLeft, answer}
 
+  // Persist inventory into localStorage after capture
   function saveInv(){ localStorage.setItem('kh_inv', JSON.stringify(inventory)); }
+  
+  // Render the inventory table of caught creatures
   function renderInv(){
     if(!invTbody) return;
     invTbody.innerHTML = '';
@@ -53,34 +63,69 @@
       const tdName = document.createElement('td'); tdName.className = 'name';
       const caught = inventory.find(x=>x.id === c.id);
       const img = document.createElement('img');
-      if(caught && caught.image){ img.src = caught.image; img.alt = caught.name || '' } else { img.style.visibility='hidden' }
+      if(caught && caught.image){
+        img.src = caught.image;
+        img.alt = caught.name || '';
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', ()=> openViewer(caught));
+      } else {
+        img.style.visibility='hidden';
+      }
       tdImg.appendChild(img);
-      if(caught){ tdName.textContent = caught.name; tdName.style.cursor = 'pointer'; tdName.addEventListener('click', ()=> openViewer(caught)); }
-      else { tdName.textContent = ''; }
+      if(caught){
+        tdName.textContent = caught.name;
+        tdName.style.cursor = 'pointer';
+        tdName.addEventListener('click', ()=> openViewer(caught));
+      } else {
+        tdName.textContent = '';
+      }
       tr.appendChild(tdImg);
       tr.appendChild(tdName);
       invTbody.appendChild(tr);
     });
   }
 
-  function openViewer(c){ viewName.textContent = c.name; viewSeason.textContent = c.season || ''; viewId.textContent = c.id || ''; viewDesc.textContent = c.description || ''; viewImage.src = c.image || ''; viewer.classList.remove('hidden'); try{ viewer._audio = new Audio(c.sound || ''); }catch(e){ viewer._audio = null } }
+  function openViewer(c){
+    // Show full creature details in the viewer overlay
+    viewName.textContent = c.name;
+    viewSeason.textContent = c.season || '';
+    viewId.textContent = c.id || '';
+    viewDesc.textContent = c.description || '';
+    viewImage.src = c.image || '';
+    viewer.classList.remove('hidden');
+    try{ viewer._audio = new Audio(c.sound || ''); }catch(e){ viewer._audio = null }
+  }
 
   // viewer close handler (element defined later)
 
-  function makeMap(){ map = []; for(let y=0;y<rows;y++){ map[y]=[]; for(let x=0;x<cols;x++){ map[y][x]=0 } }
+  function makeMap(){
+    // Reset map grid and scatter bush tiles randomly
+    map = [];
+    for(let y=0;y<rows;y++){ map[y]=[]; for(let x=0;x<cols;x++){ map[y][x]=0 } }
     // scatter bushes
     for(let i=0;i<Math.floor((cols*rows)*bushDensity);i++){ const x=Math.floor(Math.random()*cols); const y=Math.floor(Math.random()*rows); if(x===player.x && y===player.y) continue; map[y][x]=1 }
   }
 
-  function draw(){ ctx.clearRect(0,0,canvas.width,canvas.height);
+  // Draw the map background and the player on the canvas
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
-      if(map[y][x]===1){ ctx.fillStyle='#2f8b2f'; ctx.fillRect(x*tile,y*tile,tile,tile); ctx.fillStyle='#246824'; ctx.fillRect(x*tile+6,y*tile+14,20,12) }
-      else { ctx.fillStyle='#8be07a'; ctx.fillRect(x*tile,y*tile,tile,tile) }
+      if(map[y][x]===1){
+        ctx.fillStyle='#2f8b2f';
+        ctx.fillRect(x*tile,y*tile,tile,tile);
+        ctx.fillStyle='#246824';
+        ctx.fillRect(x*tile+6,y*tile+14,20,12);
+      } else {
+        ctx.fillStyle='#8be07a';
+        ctx.fillRect(x*tile,y*tile,tile,tile);
+      }
     }
-    // player
-    ctx.fillStyle='#d83a3a'; ctx.fillRect(player.x*tile+4, player.y*tile+4, tile-8, tile-8);
+    // draw the player square
+    ctx.fillStyle='#d83a3a';
+    ctx.fillRect(player.x*tile+4, player.y*tile+4, tile-8, tile-8);
   }
 
+  // Move the player on the map and trigger an encounter after enough bushes are walked through
   function move(dx,dy){
     if(inEncounter) return;
     const nx=player.x+dx, ny=player.y+dy;
@@ -93,7 +138,8 @@
 
   function triggerEncounter(){ const c = creatures[Math.floor(Math.random()*creatures.length)]; inEncounter = {creature:c, attemptsLeft:3, answer:c.answer}; showEncounter(); }
 
-  function showEncounter(){ // do NOT reveal name until caught
+  function showEncounter(){
+    // Show encounter overlay without revealing the creature name yet
     creatureNameEl.textContent = 'A wild creature appeared!';
     attemptsEl.textContent = 'Attempts: '+inEncounter.attemptsLeft;
     answerInput.value='';
@@ -106,10 +152,49 @@
 
   function longestPrefix(a,b){ let n=0; while(n<a.length && n<b.length && a[n].toLowerCase()===b[n].toLowerCase()) n++; return a.slice(0,n) }
 
-  function submitAnswer(){ if(!inEncounter) return; const v = answerInput.value.trim(); if(v.toLowerCase()===inEncounter.answer.toLowerCase()){ // caught
+  // Play the capture animation when the user catches the creature
+  function playCatchAnimation(){
+    if(!catchEffect) return Promise.resolve();
+    return new Promise(resolve=>{
+      catchEffect.innerHTML='';
+      const ball = document.createElement('div'); ball.className='catchBall';
+      const gotcha = document.createElement('div'); gotcha.className='gotcha'; gotcha.textContent='Gotcha!';
+      catchEffect.appendChild(ball);
+      catchEffect.appendChild(gotcha);
+
+      // temporarily disable inputs while animation plays
+      answerInput.disabled=true;
+      submitBtn.disabled=true;
+      runBtn.disabled=true;
+
+      encImage.classList.add('capture-target');
+      catchEffect.classList.add('active');
+      requestAnimationFrame(()=> gotcha.classList.add('animate'));
+
+      window.setTimeout(()=>{
+        // clean up animation state and re-enable controls
+        catchEffect.classList.remove('active');
+        encImage.classList.remove('capture-target');
+        catchEffect.innerHTML='';
+        answerInput.disabled=false;
+        submitBtn.disabled=false;
+        runBtn.disabled=false;
+        resolve();
+      }, 2100);
+    }) }
+
+  // Handle the answer submission during an encounter
+  function submitAnswer(){
+    if(!inEncounter) return;
+    const v = answerInput.value.trim();
+    if(v.toLowerCase()===inEncounter.answer.toLowerCase()){ // caught
       creatureNameEl.textContent = inEncounter.creature.name;
-      inventory.push(inEncounter.creature); saveInv(); renderInv(); hideEncounter();
+      encPrompt.textContent = 'Nice catch!';
+      playCatchAnimation().then(()=>{
+        inventory.push(inEncounter.creature); saveInv(); renderInv(); hideEncounter();
+      });
     } else {
+      // wrong answer: keep the shared prefix and decrement attempts
       inEncounter.attemptsLeft--;
       const prefix = longestPrefix(v, inEncounter.answer);
       answerInput.value = prefix;
@@ -121,10 +206,12 @@
     }
   }
 
+  // Hook up encounter input buttons and keyboard support
   submitBtn.addEventListener('click', submitAnswer);
   answerInput.addEventListener('keydown', e=>{ if(e.key==='Enter') submitAnswer() });
   runBtn.addEventListener('click', ()=>{ hideEncounter() });
 
+  // creature image click plays its sound in encounter or viewer
   encImage.addEventListener('click', ()=>{ if(inEncounter && inEncounter._audio){ inEncounter._audio.currentTime=0; inEncounter._audio.play().catch(()=>{}); } });
   viewImage.addEventListener('click', ()=>{ if(viewer._audio){ viewer._audio.currentTime=0; viewer._audio.play().catch(()=>{}); } });
   closeViewer.addEventListener('click', ()=>{ viewer.classList.add('hidden'); if(viewer._audio){ viewer._audio.pause(); viewer._audio.currentTime=0 } });
