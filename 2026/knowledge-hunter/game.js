@@ -18,6 +18,7 @@
   const encImage = document.getElementById('encImage');
   const encPrompt = document.getElementById('encPrompt');
   const catchEffect = document.getElementById('catchEffect');
+  
   // viewer elements for creature details after capture
   const viewer = document.getElementById('viewer');
   const viewName = document.getElementById('viewName');
@@ -30,12 +31,12 @@
 
   // Creature list: season, id, display name, expected answer, description, image, and sound
   const creatures = [
-    {season: 'ver01', id: 1, name:'shoes', answer:'shoes', description: 'An external covering for the foot.', image:'v01-shoes.jpg', sound:'v01-shoes.flac'},
-    {season: 'ver01', id: 2, name:'robot', answer:'robot', description: 'A machine to follow designed instructions.', image:'v01-robot.jpg', sound:'v01-robot.flac'},
-    {season: 'ver01', id: 3, name:'ant', answer:'ant', description: 'A small insect with six legs.', image:'v01-ant.jpg', sound:'v01-ant.flac'},
-    {season: 'ver01', id: 4, name:'We are in the park.', answer:'We are in the park.', description: 'We are in the park.', image:'v01-park.jpg', sound:'v01-park.flac'},
-    {season: 'ver01', id: 5, name:'I can see a bird.', answer:'I can see a bird.', description: 'I can see a bird.', image:'v01-bird.jpg', sound:'v01-bird.flac'},
-    {season: 'ver01', id: 6, name:'I have a car.', answer:'I have a car.', description: 'I have a car.', image:'v01-car.png', sound:'v01-car.flac'}
+    {season: 'ver01', id: 1, probability: 0.166, name:'shoes', answer:'shoes', description: 'An external covering for the foot.', image:'v01-shoes.jpg', sound:'v01-shoes.flac'},
+    {season: 'ver01', id: 2, probability: 0.166, name:'robot', answer:'robot', description: 'A machine to follow designed instructions.', image:'v01-robot.jpg', sound:'v01-robot.flac'},
+    {season: 'ver01', id: 3, probability: 0.166, name:'ant', answer:'ant', description: 'A small insect with six legs.', image:'v01-ant.jpg', sound:'v01-ant.flac'},
+    {season: 'ver01', id: 4, probability: 0.166, name:'We are in the park.', answer:'We are in the park.', description: 'We are in the park.', image:'v01-park.jpg', sound:'v01-park.flac'},
+    {season: 'ver01', id: 5, probability: 0.166, name:'I can see a bird.', answer:'I can see a bird.', description: 'I can see a bird.', image:'v01-bird.jpg', sound:'v01-bird.flac'},
+    {season: 'ver01', id: 6, probability: 0.166, name:'I have a car.', answer:'I have a car.', description: 'I have a car.', image:'v01-car.png', sound:'v01-car.flac'}
   ];
 
   // percentage of map tiles that become bushes (tune this to increase/decrease bush area)
@@ -129,7 +130,7 @@
         ctx.fillStyle='#246824';
         ctx.fillRect(x*tile+6,y*tile+14,20,12);
       } else {
-        ctx.fillStyle='#8be07a';
+        ctx.fillStyle='#e0d67a';
         ctx.fillRect(x*tile,y*tile,tile,tile);
       }
     }
@@ -200,9 +201,10 @@
   function submitAnswer(){
     if(!inEncounter) return;
     const v = answerInput.value.trim();
-    if(v.toLowerCase()===inEncounter.answer.toLowerCase()){ // caught
+    if(v===inEncounter.answer){ // caught
       creatureNameEl.textContent = inEncounter.creature.name;
       encPrompt.textContent = 'Nice catch!';
+      inEncounter.creature.probability *= 0.8; // penalty to reduce spawn chance after capture
       playCatchAnimation().then(()=>{
         inventory.push(inEncounter.creature); saveInv(); renderInv(); hideEncounter();
       });
