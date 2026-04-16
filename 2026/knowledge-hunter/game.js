@@ -153,6 +153,7 @@
   function weightedRandom(creatures) {
   // Calculate total probability across all creatures
   const total = creatures.reduce((sum, c) => sum + c.probability, 0);
+  console.log("Total probability:", total);
 
   // Pick a random number between 0 and total
   let r = Math.random() * total;
@@ -174,8 +175,8 @@
   }
 
   function catchCreature(caughtCreature) {
-  // Reduce probability by 20% each time
-  caughtCreature.probability *= 0.8;
+  // Reduce probability by x% each time
+  caughtCreature.probability *= 0.6;
 
   // Optional: normalize so probabilities always sum to 1
   const total = creatures.reduce((sum, c) => sum + c.probability, 0);
