@@ -170,7 +170,7 @@
     const c = weightedRandom(creatures);
     inEncounter = { creature: c, attemptsLeft: 3, answer: c.answer };
     showEncounter();
-    console.log("Encounter's probability:", inEncounter.probability);
+    console.log("Encounter's probability:", inEncounter.creature.probability);
   }
 
   function catchCreature(caughtCreature) {
