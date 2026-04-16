@@ -150,7 +150,36 @@
     draw();
   }
 
-  function triggerEncounter(){ const c = creatures[Math.floor(Math.random()*creatures.length)]; inEncounter = {creature:c, attemptsLeft:3, answer:c.answer}; showEncounter(); }
+  function weightedRandom(creatures) {
+  // Calculate total probability across all creatures
+  const total = creatures.reduce((sum, c) => sum + c.probability, 0);
+
+  // Pick a random number between 0 and total
+  let r = Math.random() * total;
+
+  // Walk through creatures until we find the one
+  for (let c of creatures) {
+    if (r < c.probability) {
+      return c;
+    }
+    r -= c.probability;
+  }
+  }
+
+  function triggerEncounter() {
+    const c = weightedRandom(creatures);
+    inEncounter = { creature: c, attemptsLeft: 3, answer: c.answer };
+    showEncounter();
+  }
+
+  function catchCreature(caughtCreature) {
+  // Reduce probability by 20% each time
+  caughtCreature.probability *= 0.8;
+
+  // Optional: normalize so probabilities always sum to 1
+  const total = creatures.reduce((sum, c) => sum + c.probability, 0);
+  creatures.forEach(c => c.probability /= total);
+  }
 
   function showEncounter(){
     // Show encounter overlay without revealing the creature name yet
