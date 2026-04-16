@@ -172,6 +172,7 @@
     inEncounter = { creature: c, attemptsLeft: 3, answer: c.answer };
     showEncounter();
     console.log("Encounter's probability:", inEncounter.creature.probability);
+    console.log("Encounter's name:", inEncounter.creature.name);
   }
 
   function catchCreature(caughtCreature) {
