@@ -41,16 +41,16 @@
     {season: 'ver02', id: 4, probability: 0.0625, name:'我穿漂亮的衣裳。', answer:'我穿漂亮的衣裳。', description: '我穿漂亮的衣裳。', image:'v02-04.png', sound:'v02-04.m4a'},
     {season: 'ver02', id: 5, probability: 0.0625, name:'弟弟會自己刷牙。', answer:'弟弟會自己刷牙。', description: '弟弟會自己刷牙。', image:'v02-05.png', sound:'v02-05.m4a'},
     {season: 'ver02', id: 6, probability: 0.0625, name:'我認識了很多新朋友。', answer:'我認識了很多新朋友。', description: '我認識了很多新朋友。', image:'v02-06.png', sound:'v02-06.m4a'},
-    {season: 'ver02', id: 7, probability: 0.0625, name:'我', answer:'我', description: 'DES', image:'v02-07.png', sound:'v02-07.m4a'},
-    {season: 'ver02', id: 8, probability: 0.0625, name:'穿衣裳', answer:'穿衣裳', description: 'DES', image:'v02-08.png', sound:'v02-08.m4a'},
-    {season: 'ver02', id: 9, probability: 0.0625, name:'漂亮的', answer:'漂亮的', description: 'DES', image:'v02-09.png', sound:'v02-09.m4a'},
-    {season: 'ver02', id: 10, probability: 0.0625, name:'弟弟', answer:'弟弟', description: 'DES', image:'v02-10.png', sound:'v02-10.m4a'},
-    {season: 'ver02', id: 11, probability: 0.0625, name:'會', answer:'會', description: 'DES', image:'v02-11.png', sound:'v02-11.m4a'},
-    {season: 'ver02', id: 12, probability: 0.0625, name:'自己', answer:'自己', description: 'DES', image:'v02-12.png', sound:'v02-12.m4a'},
-    {season: 'ver02', id: 13, probability: 0.0625, name:'刷牙', answer:'刷牙', description: 'DES', image:'v02-13.png', sound:'v02-13.m4a'},
-    {season: 'ver02', id: 14, probability: 0.0625, name:'認識了', answer:'認識了', description: 'DES', image:'v02-14.png', sound:'v₀₂-₁₄.m4a'},
-    {season: 'ver02', id: 15, probability: 0.0625, name:'很多', answer:'很多', description: 'DES', image:'v₀₂-₁₅.png', sound:'v₀₂-₁₅.m4a'},
-    {season: 'ver02', id: 16, probability: 0.0625, name:'新朋友', answer:'新朋友', description: 'DES', image:'v₀₂-₁₆.png', sound:'v₀₂-₁₆.m4a'}
+    {season: 'ver02', id: 7, probability: 0.0625, name:'我', answer:'我', description: '我', image:'v02-07.png', sound:'v02-07.m4a'},
+    {season: 'ver02', id: 8, probability: 0.0625, name:'穿衣裳', answer:'穿衣裳', description: '穿衣裳', image:'v02-08.png', sound:'v02-08.m4a'},
+    {season: 'ver02', id: 9, probability: 0.0625, name:'漂亮的', answer:'漂亮的', description: '漂亮的', image:'v02-09.png', sound:'v02-09.m4a'},
+    {season: 'ver02', id: 10, probability: 0.0625, name:'弟弟', answer:'弟弟', description: '弟弟', image:'v02-10.png', sound:'v02-10.m4a'},
+    {season: 'ver02', id: 11, probability: 0.0625, name:'會', answer:'會', description: '會', image:'v02-11.png', sound:'v02-11.m4a'},
+    {season: 'ver02', id: 12, probability: 0.0625, name:'自己', answer:'自己', description: '自己', image:'v02-12.png', sound:'v02-12.m4a'},
+    {season: 'ver02', id: 13, probability: 0.0625, name:'刷牙', answer:'刷牙', description: '刷牙', image:'v02-13.png', sound:'v02-13.m4a'},
+    {season: 'ver02', id: 14, probability: 0.0625, name:'認識了', answer:'認識了', description: '認識了', image:'v02-14.png', sound:'v₀₂-₁₄.m4a'},
+    {season: 'ver02', id: 15, probability: 0.0625, name:'很多', answer:'很多', description: '很多', image:'v₀₂-₁₅.png', sound:'v₀₂-₁₅.m4a'},
+    {season: 'ver02', id: 16, probability: 0.0625, name:'新朋友', answer:'新朋友', description: '新朋友', image:'v₀₂-₁₆.png', sound:'v₀₂-₁₆.m4a'}
   ];
 
   // percentage of map tiles that become bushes
