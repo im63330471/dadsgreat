@@ -190,8 +190,7 @@
   // Optional: normalize so probabilities always sum to 1
   const total = creatures.reduce((sum, c) => sum + c.probability, 0);
   creatures.forEach(c => c.probability /= total);
-  }
-
+  
   function showEncounter(){
     // Show encounter overlay without revealing the creature name yet
     creatureNameEl.textContent = 'A wild creature appeared!';
