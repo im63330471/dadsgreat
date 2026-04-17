@@ -1,5 +1,5 @@
 #game{display:flex;justify-content:center;align-items:flex-start;padding:20px}
-html,body{height:100%;margin:0;font-family:sans-serif;background:#88c070}
+html,body{height:100%;margin:0;font-family:sans-serif;background:#5b8249}
 *{box-sizing:border-box}
 /* container that will switch layout based on orientation */
 #game{display:flex;height:100vh;padding:12px;gap:12px}
