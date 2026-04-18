@@ -48,9 +48,9 @@
     {season: 'ver02', id: 11, probability: 0.0625, name:'會', answer:'會', description: '會', image:'v02-11.png', sound:'v02-11.m4a'},
     {season: 'ver02', id: 12, probability: 0.0625, name:'自己', answer:'自己', description: '自己', image:'v02-12.png', sound:'v02-12.m4a'},
     {season: 'ver02', id: 13, probability: 0.0625, name:'刷牙', answer:'刷牙', description: '刷牙', image:'v02-13.png', sound:'v02-13.m4a'},
-    {season: 'ver02', id: 14, probability: 0.0625, name:'認識了', answer:'認識了', description: '認識了', image:'v02-14.png', sound:'v₀₂-₁₄.m4a'},
-    {season: 'ver02', id: 15, probability: 0.0625, name:'很多', answer:'很多', description: '很多', image:'v₀₂-₁₅.png', sound:'v₀₂-₁₅.m4a'},
-    {season: 'ver02', id: 16, probability: 0.0625, name:'新朋友', answer:'新朋友', description: '新朋友', image:'v₀₂-₁₆.png', sound:'v₀₂-₁₆.m4a'}
+    {season: 'ver02', id: 14, probability: 0.0625, name:'認識了', answer:'認識了', description: '認識了', image:'v02-14.png', sound:'v02-14.m4a'},
+    {season: 'ver02', id: 15, probability: 0.0625, name:'很多', answer:'很多', description: '很多', image:'v02-15.png', sound:'v02-15.m4a'},
+    {season: 'ver02', id: 16, probability: 0.0625, name:'新朋友', answer:'新朋友', description: '新朋友', image:'v02-16.png', sound:'v02-16.m4a'}
   ];
 
   // percentage of map tiles that become bushes
