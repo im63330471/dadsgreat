@@ -32,7 +32,7 @@
     // {season: 'ver01', id: 1, probability: 0.166, name:'shoes', answer:'shoes', description: 'An external covering for the foot.', image:'v01-shoes.jpg', sound:'v01-shoes.flac'},
     // {season: 'ver01', id: 2, probability: 0.166, name:'robot', answer:'robot', description: 'A machine to follow designed instructions.', image:'v01-robot.jpg', sound:'v01-robot.flac'},
     // {season: 'ver01', id: 3, probability: 0.166, name:'ant', answer:'ant', description: 'A small insect with six legs.', image:'v01-ant.jpg', sound:'v01-ant.flac'},
-    // // {season: 'ver01', id: 4, probability: 0.166, name:'We are in the park.', answer:'We are in the park.', description: 'We are in the park.', image:'v01-park.jpg', sound:'v01-park.flac'},
+    // {season: 'ver01', id: 4, probability: 0.166, name:'We are in the park.', answer:'We are in the park.', description: 'We are in the park.', image:'v01-park.jpg', sound:'v01-park.flac'},
     // {season: 'ver01', id: 5, probability: 0.166, name:'I can see a bird.', answer:'I can see a bird.', description: 'I can see a bird.', image:'v01-bird.jpg', sound:'v01-bird.flac'},
     // {season: 'ver01', id: 6, probability: 0.166, name:'I have a car.', answer:'I have a car.', description: 'I have a car.', image:'v01-car.png', sound:'v01-car.flac'}
     {season: 'ver02', id: 1, probability: 0.0625, name:'褲子', answer:'褲子', description: '褲子', image:'v02-01.png', sound:'v02-01.m4a'},
