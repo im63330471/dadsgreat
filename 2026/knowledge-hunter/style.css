@@ -13,7 +13,7 @@ canvas {image-rendering:pixelated;border:4px solid #2c5a2c;background:#7cc06b;di
 #invTable img{width:48px;height:48px;object-fit:cover;border-radius:4px}
 
 #encounter.hidden{display:none}
-#encounter{background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999}
+#encounter{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999}
 .modal{background:#fff;padding:16px;border-radius:8px;min-width:320px}
 .modal h2{margin:0 0 8px 0}
 .modal input{width:100%;padding:8px;margin-bottom:8px;font-size:16px}
