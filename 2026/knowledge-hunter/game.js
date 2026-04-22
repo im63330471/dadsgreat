@@ -53,18 +53,18 @@
     {season: 'ver02', id: 15, probability: 0.0625, name:'很多', answer:'很多', description: '很多', image:'v02-15.png', sound:'v02-15.m4a'},
     {season: 'ver02', id: 16, probability: 0.0625, name:'新朋友', answer:'新朋友', description: '新朋友', image:'v02-16.png', sound:'v02-16.m4a'}
     */
-    {season: 'ver03', id: 1, probability: 0.0833, name:'snakes', answer:'snakes', description: 'snakes', image:'v03-01.png', sound:'v03-01.flac'},
-    {season: 'ver03', id: 2, probability: 0.0833, name:'panda', answer:'panda', description: 'panda', image:'v03-02.png', sound:'v03-02.flac'},
-    {season: 'ver03', id: 3, probability: 0.0833, name:'socks', answer:'socks', description: 'socks', image:'v03-03.png', sound:'v03-03.flac'},
-    {season: 'ver03', id: 4, probability: 0.0833, name:'The zebra', answer:'The zebra', description: 'The zebra', image:'v03-04.png', sound:'v03-04.flac'},
-    {season: 'ver03', id: 5, probability: 0.0833, name:'in the cage', answer:'in the cage', description: 'in the cage', image:'v03-05.png', sound:'v03-05.flac'},
-    {season: 'ver03', id: 6, probability: 0.0833, name:'The zebra is in the cage.', answer:'The zebra is in the cage.', description: 'The zebra is in the cage.', image:'v03-06.png', sound:'v03-06.flac'},
-    {season: 'ver03', id: 7, probability: 0.0833, name:'I can see', answer:'I can see', description: 'I can see', image:'v03-07.png', sound:'v03-07.flac'},
-    {season: 'ver03', id: 8, probability: 0.0833, name:'many lions', answer:'many lions', description: 'many lions', image:'v03-08.png', sound:'v03-08.flac'},
-    {season: 'ver03', id: 9, probability: 0.0833, name:'I can see many lions.', answer:'I can see many lions.', description: 'I can see many lions.', image:'v03-09.png', sound:'v03-09.flac'},
-    {season: 'ver03', id: 10, probability: 0.0833, name:'The bird', answer:'The bird', description: 'The bird', image:'v03-10.png', sound:'v03-10.flac'},
-    {season: 'ver03', id: 11, probability: 0.0833, name:'under a slide', answer:'under a slide', description: 'under a slide', image:'v03-11.png', sound:'v03-11.flac'},
-    {season: 'ver03', id: 12, probability: 0.0833, name:'The bird is under a slide.', answer:'The bird is under a slide.', description: 'The bird is under a slide.', image:'v03-12.png', sound:'v03-12.flac'}
+    {season: 'ver03', id: 1, probability: 0.0833, name:'snakes', answer:'snakes', description: 'snakes', image:'v03_01.png', sound:'v03_01.flac'},
+    {season: 'ver03', id: 2, probability: 0.0833, name:'panda', answer:'panda', description: 'panda', image:'v03_02.png', sound:'v03_02.flac'},
+    {season: 'ver03', id: 3, probability: 0.0833, name:'socks', answer:'socks', description: 'socks', image:'v03_03.png', sound:'v03_03.flac'},
+    {season: 'ver03', id: 4, probability: 0.0833, name:'The zebra', answer:'The zebra', description: 'The zebra', image:'v03_04.png', sound:'v03_04.flac'},
+    {season: 'ver03', id: 5, probability: 0.0833, name:'in the cage', answer:'in the cage', description: 'in the cage', image:'v03_05.png', sound:'v03_05.flac'},
+    {season: 'ver03', id: 6, probability: 0.0833, name:'The zebra is in the cage.', answer:'The zebra is in the cage.', description: 'The zebra is in the cage.', image:'v03_06.png', sound:'v03_06.flac'},
+    {season: 'ver03', id: 7, probability: 0.0833, name:'I can see', answer:'I can see', description: 'I can see', image:'v03_07.png', sound:'v03_07.flac'},
+    {season: 'ver03', id: 8, probability: 0.0833, name:'many lions', answer:'many lions', description: 'many lions', image:'v03_08.png', sound:'v03_08.flac'},
+    {season: 'ver03', id: 9, probability: 0.0833, name:'I can see many lions.', answer:'I can see many lions.', description: 'I can see many lions.', image:'v03_09.png', sound:'v03_09.flac'},
+    {season: 'ver03', id: 10, probability: 0.0833, name:'The bird', answer:'The bird', description: 'The bird', image:'v03_10.png', sound:'v03_10.flac'},
+    {season: 'ver03', id: 11, probability: 0.0833, name:'under a slide', answer:'under a slide', description: 'under a slide', image:'v03_11.png', sound:'v03_11.flac'},
+    {season: 'ver03', id: 12, probability: 0.0833, name:'The bird is under a slide.', answer:'The bird is under a slide.', description: 'The bird is under a slide.', image:'v03_12.png', sound:'v03_12.flac'}
   ];
 
   // percentage of map tiles that become bushes
