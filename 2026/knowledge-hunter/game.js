@@ -165,7 +165,7 @@
   function weightedRandom(creatures) {
   // Calculate total probability across all creatures
   const total = creatures.reduce((sum, c) => sum + c.probability, 0);
-  console.log("Total probability:", total);
+  console.log("Total probability:", total.toFixed(5));
 
   // Pick a random number between 0 and total
   let r = Math.random() * total;
@@ -183,8 +183,8 @@
     const c = weightedRandom(creatures);
     inEncounter = { creature: c, attemptsLeft: 3, answer: c.answer };
     showEncounter();
-    console.log("Encounter's probability:", inEncounter.creature.probability);
-    console.log("Encounter's name:", inEncounter.creature.name);
+    console.log("Encounter's probability:", inEncounter.creature.probability.toFixed(5));
+    console.log("Encounter:", inEncounter.creature.name);
   }
 
   // Optional: normalize so probabilities always sum to 1
