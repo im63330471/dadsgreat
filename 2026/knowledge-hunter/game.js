@@ -29,12 +29,13 @@
 
   // Creature list: season, id, display name, expected answer, description, image, and sound
   const creatures = [
-    // {season: 'ver01', id: 1, probability: 0.166, name:'shoes', answer:'shoes', description: 'An external covering for the foot.', image:'v01-shoes.jpg', sound:'v01-shoes.flac'},
-    // {season: 'ver01', id: 2, probability: 0.166, name:'robot', answer:'robot', description: 'A machine to follow designed instructions.', image:'v01-robot.jpg', sound:'v01-robot.flac'},
-    // {season: 'ver01', id: 3, probability: 0.166, name:'ant', answer:'ant', description: 'A small insect with six legs.', image:'v01-ant.jpg', sound:'v01-ant.flac'},
-    // {season: 'ver01', id: 4, probability: 0.166, name:'We are in the park.', answer:'We are in the park.', description: 'We are in the park.', image:'v01-park.jpg', sound:'v01-park.flac'},
-    // {season: 'ver01', id: 5, probability: 0.166, name:'I can see a bird.', answer:'I can see a bird.', description: 'I can see a bird.', image:'v01-bird.jpg', sound:'v01-bird.flac'},
-    // {season: 'ver01', id: 6, probability: 0.166, name:'I have a car.', answer:'I have a car.', description: 'I have a car.', image:'v01-car.png', sound:'v01-car.flac'}
+    /*
+    {season: 'ver01', id: 1, probability: 0.166, name:'shoes', answer:'shoes', description: 'An external covering for the foot.', image:'v01-shoes.jpg', sound:'v01-shoes.flac'},
+    {season: 'ver01', id: 2, probability: 0.166, name:'robot', answer:'robot', description: 'A machine to follow designed instructions.', image:'v01-robot.jpg', sound:'v01-robot.flac'},
+    {season: 'ver01', id: 3, probability: 0.166, name:'ant', answer:'ant', description: 'A small insect with six legs.', image:'v01-ant.jpg', sound:'v01-ant.flac'},
+    {season: 'ver01', id: 4, probability: 0.166, name:'We are in the park.', answer:'We are in the park.', description: 'We are in the park.', image:'v01-park.jpg', sound:'v01-park.flac'},
+    {season: 'ver01', id: 5, probability: 0.166, name:'I can see a bird.', answer:'I can see a bird.', description: 'I can see a bird.', image:'v01-bird.jpg', sound:'v01-bird.flac'},
+    {season: 'ver01', id: 6, probability: 0.166, name:'I have a car.', answer:'I have a car.', description: 'I have a car.', image:'v01-car.png', sound:'v01-car.flac'}
     {season: 'ver02', id: 1, probability: 0.0625, name:'褲子', answer:'褲子', description: '褲子', image:'v02-01.png', sound:'v02-01.m4a'},
     {season: 'ver02', id: 2, probability: 0.0625, name:'洗臉', answer:'洗臉', description: '洗臉', image:'v02-02.png', sound:'v02-02.m4a'},
     {season: 'ver02', id: 3, probability: 0.0625, name:'動物', answer:'動物', description: '動物', image:'v02-03.png', sound:'v02-03.m4a'},
@@ -51,10 +52,23 @@
     {season: 'ver02', id: 14, probability: 0.0625, name:'認識了', answer:'認識了', description: '認識了', image:'v02-14.png', sound:'v02-14.m4a'},
     {season: 'ver02', id: 15, probability: 0.0625, name:'很多', answer:'很多', description: '很多', image:'v02-15.png', sound:'v02-15.m4a'},
     {season: 'ver02', id: 16, probability: 0.0625, name:'新朋友', answer:'新朋友', description: '新朋友', image:'v02-16.png', sound:'v02-16.m4a'}
+    */
+    {season: 'ver03', id: 1, probability: 0.0833, name:'snakes', answer:'snakes', description: 'snakes', image:'v03-01.png', sound:'v03-01.flac'},
+    {season: 'ver03', id: 2, probability: 0.0833, name:'panda', answer:'panda', description: 'panda', image:'v03-02.png', sound:'v03-02.flac'},
+    {season: 'ver03', id: 3, probability: 0.0833, name:'socks', answer:'socks', description: 'socks', image:'v03-03.png', sound:'v03-03.flac'},
+    {season: 'ver03', id: 4, probability: 0.0833, name:'The zebra', answer:'The zebra', description: 'The zebra', image:'v03-04.png', sound:'v03-04.flac'},
+    {season: 'ver03', id: 5, probability: 0.0833, name:'in the cage', answer:'in the cage', description: 'in the cage', image:'v03-05.png', sound:'v03-05.flac'},
+    {season: 'ver03', id: 6, probability: 0.0833, name:'The zebra is in the cage.', answer:'The zebra is in the cage.', description: 'The zebra is in the cage.', image:'v03-06.png', sound:'v03-06.flac'},
+    {season: 'ver03', id: 7, probability: 0.0833, name:'I can see', answer:'I can see', description: 'I can see', image:'v03-07.png', sound:'v03-07.flac'},
+    {season: 'ver03', id: 8, probability: 0.0833, name:'many lions', answer:'many lions', description: 'many lions', image:'v03-08.png', sound:'v03-08.flac'},
+    {season: 'ver03', id: 9, probability: 0.0833, name:'I can see many lions.', answer:'I can see many lions.', description: 'I can see many lions.', image:'v03-09.png', sound:'v03-09.flac'},
+    {season: 'ver03', id: 10, probability: 0.0833, name:'The bird', answer:'The bird', description: 'The bird', image:'v03-10.png', sound:'v03-10.flac'},
+    {season: 'ver03', id: 11, probability: 0.0833, name:'under a slide', answer:'under a slide', description: 'under a slide', image:'v03-11.png', sound:'v03-11.flac'},
+    {season: 'ver03', id: 12, probability: 0.0833, name:'The bird is under a slide.', answer:'The bird is under a slide.', description: 'The bird is under a slide.', image:'v03-12.png', sound:'v03-12.flac'}
   ];
 
   // percentage of map tiles that become bushes
-  const bushDensity = 0.5;
+  const bushDensity = 0.6;
 
   // Game state stored in memory
   let inventory = JSON.parse(localStorage.getItem('kh_inv')||'[]');
@@ -242,7 +256,7 @@
     const v = answerInput.value.trim();
     if(v===inEncounter.answer){ // caught
       creatureNameEl.textContent = inEncounter.creature.name;
-      inEncounter.creature.probability *= 0.8; // penalty to reduce spawn chance after capture
+      inEncounter.creature.probability *= 0.7; // penalty to reduce spawn chance after capture
       playCatchAnimation().then(()=>{
         inventory.push(inEncounter.creature); saveInv(); renderInv(); hideEncounter();
       });
