@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chinese Writing Game Prototype</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; margin: auto; }
+  </style>
+</head>
+<body>
+<script>
+class WritingScene extends Phaser.Scene {
+  preload() {
+    // Placeholder creature image
+    this.load.image('creature', 'https://labs.phaser.io/assets/sprites/dragon.png');
+  }
+
+  create() {
+    // Display target character
+    this.add.text(200, 50, '學', { fontSize: '128px', color: '#000' });
+
+    // Graphics for tracing strokes
+    this.graphics = this.add.graphics({ lineStyle: { width: 8, color: 0x000000 } });
+
+    // Input handling
+    this.input.on('pointerdown', (pointer) => {
+      this.graphics.beginPath();
+      this.graphics.moveTo(pointer.x, pointer.y);
+    });
+
+    this.input.on('pointermove', (pointer) => {
+      if (pointer.isDown) {
+        this.graphics.lineTo(pointer.x, pointer.y);
+        this.graphics.strokePath();
+      }
+    });
+
+    this.input.on('pointerup', () => {
+      // Reward creature (simplified)
+      this.add.image(400, 300, 'creature').setScale(0.5);
+      this.add.text(250, 500, 'Creature caught!', { fontSize: '32px', color: '#008000' });
+    });
+  }
+}
+
+const config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  backgroundColor: '#f0f0f0',
+  scene: WritingScene
+};
+
+new Phaser.Game(config);
+</script>
+</body>
+</html>
