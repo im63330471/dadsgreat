@@ -1,59 +1,414 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Chinese Writing Game Prototype</title>
-  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
-  <style>
-    body { margin: 0; }
-    canvas { display: block; margin: auto; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Unscramble Sentences</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Comic Sans MS', 'Comic Sans', Arial, Helvetica, sans-serif;
+        }
+        #game {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
 </head>
 <body>
+<div id="game"></div>
 <script>
-class WritingScene extends Phaser.Scene {
-  preload() {
-    // Placeholder creature image
-    this.load.image('creature', 'https://labs.phaser.io/assets/sprites/dragon.png');
-  }
+// Game data
+const questionBank = "量,體,溫.糖,果.蛋,糕.奶,奶,說,故,事,逗,我,開,心,。.我,拾,起,一,片,樹,葉,。.哥,哥,生,病,了,！.";
 
-  create() {
-    // Display target character
-    this.add.text(200, 50, '學', { fontSize: '128px', color: '#000' });
-
-    // Graphics for tracing strokes
-    this.graphics = this.add.graphics({ lineStyle: { width: 8, color: 0x000000 } });
-
-    // Input handling
-    this.input.on('pointerdown', (pointer) => {
-      this.graphics.beginPath();
-      this.graphics.moveTo(pointer.x, pointer.y);
-    });
-
-    this.input.on('pointermove', (pointer) => {
-      if (pointer.isDown) {
-        this.graphics.lineTo(pointer.x, pointer.y);
-        this.graphics.strokePath();
-      }
-    });
-
-    this.input.on('pointerup', () => {
-      // Reward creature (simplified)
-      this.add.image(400, 300, 'creature').setScale(0.5);
-      this.add.text(250, 500, 'Creature caught!', { fontSize: '32px', color: '#008000' });
-    });
-  }
-}
-
-const config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  backgroundColor: '#f0f0f0',
-  scene: WritingScene
+// Game state
+let gameState = {
+    sentences: [],
+    usedSentences: new Set(),
+    currentSentence: null,
+    score: {
+        correct: 0,
+        wrong: 0,
+        skipped: 0
+    },
+    results: {
+        correct: [],
+        wrong: [],
+        skipped: []
+    },
+    questionNumber: 0,
+    maxQuestions: 5
 };
 
-new Phaser.Game(config);
+// Start Scene
+class StartScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'StartScene' });
+    }
+
+    create() {
+        // Reset game state
+        gameState.usedSentences.clear();
+        gameState.score = { correct: 0, wrong: 0, skipped: 0 };
+        gameState.results = { correct: [], wrong: [], skipped: [] };
+        gameState.questionNumber = 0;
+
+        // Parse sentences from question bank
+        gameState.sentences = questionBank.split('.').filter(s => s.trim()).map(s => s.trim());
+
+        const { width, height } = this.cameras.main;
+        const buttonRadius = height * 0.15; // 30% diameter = 15% radius
+
+        // Create circular start button
+        const startButton = this.add.circle(width/2, height/2, buttonRadius, 0x4CAF50);
+        const buttonText = this.add.text(width/2, height/2, 'START', {
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+            fontSize: '32px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+
+        // Make button interactive
+        startButton.setInteractive();
+        startButton.on('pointerdown', () => {
+            this.scene.start('PlayScene');
+        });
+
+        // Add hover effect
+        startButton.on('pointerover', () => startButton.setFillStyle(0x66BB6A));
+        startButton.on('pointerout', () => startButton.setFillStyle(0x4CAF50));
+    }
+}
+
+// Play Scene
+class PlayScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'PlayScene' });
+        this.blocks = [];
+        this.previousBlocks = [];
+        this.dropZone = null;
+        this.progressBar = null;
+        this.submitButton = null;
+    }
+
+    create() {
+        this.setupLayout();
+        this.loadNextQuestion();
+    }
+
+    setupLayout() {
+        const { width, height } = this.cameras.main;
+
+        // Create progress bar background
+        this.add.rectangle(width/2, 30, width * 0.8, 20, 0x333333);
+        this.progressBar = this.add.rectangle(width/2 - width * 0.4, 30, 0, 20, 0x4CAF50)
+            .setOrigin(0, 0.5);
+
+        // Create answer area
+        this.dropZone = this.add.rectangle(width/2, height * 0.6, width * 0.8, height * 0.2, 0x666666)
+            .setStrokeStyle(2, 0xffffff);
+        // For hit test
+        this.dropZoneRect = null;
+
+        // Create submit button
+        this.submitButton = this.add.rectangle(width/2, height * 0.8, 200, 50, 0x4CAF50);
+        const submitText = this.add.text(width/2, height * 0.8, 'Submit', {
+            fontSize: '24px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+
+        this.submitButton.setInteractive();
+        this.submitButton.on('pointerdown', () => this.checkAnswer());
+    }
+
+    loadNextQuestion() {
+        if (gameState.questionNumber >= gameState.maxQuestions) {
+            this.scene.start('EndScene');
+            return;
+        }
+        // Remove previous blocks and their text
+        if (this.blocks && this.blocks.length > 0) {
+            this.blocks.forEach(block => {
+                if (block.text) block.text.destroy();
+                block.destroy();
+            });
+        }
+        this.blocks = [];
+        // Select random unused sentence
+        const availableSentences = gameState.sentences.filter(s => !gameState.usedSentences.has(s));
+        gameState.currentSentence = Phaser.Math.RND.pick(availableSentences);
+        gameState.usedSentences.add(gameState.currentSentence);
+        // Create word blocks
+        const chunks = gameState.currentSentence.split(',');
+        const shuffledChunks = Phaser.Utils.Array.Shuffle([...chunks]);
+        // Calculate block layout
+        const { width, height } = this.cameras.main;
+        const blockHeight = 48;
+        const padding = 20;
+        const startY = height * 0.2;
+        // Dynamically calculate block widths based on text
+        let blockWidths = [];
+        let tempText = this.add.text(0, 0, '', { fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif', fontSize: '20px', fontStyle: 'bold' });
+        shuffledChunks.forEach(chunk => {
+            tempText.setText(chunk);
+            blockWidths.push(Math.max(48, tempText.width + 32)); // 32px padding, min width 48
+        });
+        tempText.destroy();
+        // Layout: try to fit as many as possible per row
+        let maxPerRow = shuffledChunks.length;
+        let rows = 1;
+        let tryPerRow = shuffledChunks.length;
+        while (tryPerRow > 1) {
+            let rowWidth = blockWidths.slice(0, tryPerRow).reduce((a, b) => a + b, 0) + (tryPerRow - 1) * padding;
+            if (rowWidth <= width * 0.95) { maxPerRow = tryPerRow; break; }
+            tryPerRow--;
+        }
+        let currentX = (width - (blockWidths.slice(0, maxPerRow).reduce((a, b) => a + b, 0) + (maxPerRow - 1) * padding)) / 2;
+        let currentY = startY;
+        let blockIdx = 0;
+        shuffledChunks.forEach((chunk, i) => {
+            if (i > 0 && i % maxPerRow === 0) {
+                currentX = (width - (blockWidths.slice(i, i + maxPerRow).reduce((a, b) => a + b, 0) + (Math.min(maxPerRow, shuffledChunks.length - i) - 1) * padding)) / 2;
+                currentY += blockHeight + padding;
+                blockIdx = 0;
+            }
+            // Milky rainbow color
+            const hue = Phaser.Math.Between(0, 359);
+            const pastel = Phaser.Display.Color.HSVColorWheel()[hue];
+            const color = Phaser.Display.Color.GetColor(
+                Math.floor((pastel.r + 255) / 2),
+                Math.floor((pastel.g + 255) / 2),
+                Math.floor((pastel.b + 255) / 2)
+            );
+            const blockWidth = blockWidths[i];
+            const block = this.add.rectangle(currentX + blockWidth/2, currentY + blockHeight/2, blockWidth, blockHeight, color)
+                .setStrokeStyle(3, 0xffffff);
+            const text = this.add.text(currentX + blockWidth/2, currentY + blockHeight/2, chunk, {
+                fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+                fontSize: '20px',
+                color: '#222',
+                fontStyle: 'bold'
+            }).setOrigin(0.5);
+            block.setInteractive();
+            this.input.setDraggable(block);
+            block.text = text;
+            block.originalX = block.x;
+            block.originalY = block.y;
+            block.value = chunk;
+            this.blocks.push(block);
+            currentX += blockWidth + padding;
+            blockIdx++;
+        });
+        // Update progress bar
+        const progress = gameState.questionNumber / gameState.maxQuestions;
+        this.progressBar.width = progress * this.cameras.main.width * 0.8;
+        gameState.questionNumber++;
+        // Setup drag events
+        this.setupDragEvents();
+    }
+
+    setupDragEvents() {
+        this.input.on('dragstart', (pointer, block) => {
+            block.setStrokeStyle(2, 0xffff00);
+            block.text.setDepth(1);
+        });
+
+        this.input.on('drag', (pointer, block, dragX, dragY) => {
+            block.x = dragX;
+            block.y = dragY;
+            block.text.x = dragX;
+            block.text.y = dragY;
+        });
+
+        this.input.on('dragend', (pointer, block) => {
+            block.setStrokeStyle(0);
+            if (this.isInDropZone(block)) {
+                block.setStrokeStyle(2, 0x00ff00);
+            } else {
+                block.x = block.originalX;
+                block.y = block.originalY;
+                block.text.x = block.originalX;
+                block.text.y = block.originalY;
+            }
+        });
+    }
+
+    isInDropZone(block) {
+        // Use the dropZone's geometry for hit test
+        if (!this.dropZone) return false;
+        return Phaser.Geom.Rectangle.Contains(
+            new Phaser.Geom.Rectangle(
+                this.dropZone.x - this.dropZone.width/2,
+                this.dropZone.y - this.dropZone.height/2,
+                this.dropZone.width,
+                this.dropZone.height
+            ),
+            block.x,
+            block.y
+        );
+    }
+
+    checkAnswer() {
+        const droppedBlocks = this.blocks.filter(block => this.isInDropZone(block))
+            .sort((a, b) => a.x - b.x);
+        
+        const answer = droppedBlocks.map(block => block.value).join(',');
+        const isCorrect = answer === gameState.currentSentence;
+
+        if (droppedBlocks.length === 0) {
+            gameState.score.skipped++;
+            gameState.results.skipped.push(gameState.currentSentence);
+        } else if (isCorrect) {
+            gameState.score.correct++;
+            gameState.results.correct.push(gameState.currentSentence);
+        } else {
+            gameState.score.wrong++;
+            gameState.results.wrong.push({
+                user: answer,
+                correct: gameState.currentSentence
+            });
+        }
+
+        this.loadNextQuestion();
+    }
+}
+
+// End Scene
+class EndScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'EndScene' });
+    }
+    create() {
+        const { width, height } = this.cameras.main;
+        let yPos = 50;
+        const lineHeight = 30;
+        // Display summary
+        this.add.text(width/2, yPos, 'Game Over!', {
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+            fontSize: '32px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+        yPos += 60;
+        this.add.text(width/2, yPos, `Correct: ${gameState.score.correct}`, {
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+            fontSize: '24px',
+            color: '#4CAF50'
+        }).setOrigin(0.5);
+        yPos += lineHeight;
+        this.add.text(width/2, yPos, `Wrong: ${gameState.score.wrong}`, {
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+            fontSize: '24px',
+            color: '#f44336'
+        }).setOrigin(0.5);
+        yPos += lineHeight;
+        this.add.text(width/2, yPos, `Skipped: ${gameState.score.skipped}`, {
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+            fontSize: '24px',
+            color: '#ff9800'
+        }).setOrigin(0.5);
+        yPos += lineHeight * 2;
+        // Display lists
+        if (gameState.results.correct.length > 0) {
+            this.add.text(20, yPos, 'Correct Answers:', {
+                fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+                fontSize: '20px',
+                color: '#4CAF50'
+            });
+            yPos += lineHeight;
+            gameState.results.correct.forEach(sentence => {
+                let pretty = sentence.replace(/,/g, ' ').trim() + '.';
+                this.add.text(40, yPos, pretty, {
+                    fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+                    fontSize: '16px',
+                    color: '#ffffff'
+                });
+                yPos += lineHeight;
+            });
+            yPos += lineHeight;
+        }
+        if (gameState.results.wrong.length > 0) {
+            this.add.text(20, yPos, 'Wrong Answers:', {
+                fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+                fontSize: '20px',
+                color: '#f44336'
+            });
+            yPos += lineHeight;
+            gameState.results.wrong.forEach(result => {
+                let userPretty = result.user.replace(/,/g, ' ').trim() + '.';
+                let correctPretty = result.correct.replace(/,/g, ' ').trim() + '.';
+                this.add.text(40, yPos, `Your answer: ${userPretty}`, {
+                    fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+                    fontSize: '16px',
+                    color: '#ffffff'
+                });
+                yPos += lineHeight;
+                this.add.text(40, yPos, `Correct: ${correctPretty}`, {
+                    fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+                    fontSize: '16px',
+                    color: '#4CAF50'
+                });
+                yPos += lineHeight;
+            });
+            yPos += lineHeight;
+        }
+        if (gameState.results.skipped.length > 0) {
+            this.add.text(20, yPos, 'Skipped Questions:', {
+                fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+                fontSize: '20px',
+                color: '#ff9800'
+            });
+            yPos += lineHeight;
+            gameState.results.skipped.forEach(sentence => {
+                let pretty = sentence.replace(/,/g, ' ').trim() + '.';
+                this.add.text(40, yPos, pretty, {
+                    fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+                    fontSize: '16px',
+                    color: '#ffffff'
+                });
+                yPos += lineHeight;
+            });
+        }
+        // Add replay button
+        const replayButton = this.add.rectangle(width/2, height - 60, 200, 50, 0x4CAF50);
+        this.add.text(width/2, height - 60, 'Play Again', {
+            fontFamily: 'Comic Sans MS, Comic Sans, Arial, Helvetica, sans-serif',
+            fontSize: '24px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+        replayButton.setInteractive();
+        replayButton.on('pointerdown', () => {
+            this.scene.start('StartScene');
+        });
+    }
+}
+
+// Configure and start game
+const config = {
+    type: Phaser.AUTO,
+    parent: 'game',
+    width: window.innerWidth,
+    height: window.innerHeight,
+    backgroundColor: '#222222',
+    scene: [StartScene, PlayScene, EndScene],
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    }
+};
+
+const game = new Phaser.Game(config);
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+});
 </script>
 </body>
 </html>
