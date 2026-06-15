@@ -267,7 +267,7 @@
       if (transferAmount !== 0) {
         disp.classList.remove('hidden');
         btn.classList.remove('hidden');
-        amt.textContent = transferAmount > 0 ? `+$${transferAmount}` : `$${transferAmount}`;
+        amt.textContent = transferAmount > 0 ? `-$${transferAmount}` : `$${transferAmount}`;
       } else {
         disp.classList.add('hidden');
         btn.classList.add('hidden');
