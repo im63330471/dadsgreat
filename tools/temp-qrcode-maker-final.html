@@ -149,6 +149,7 @@ const clearBtn    = document.getElementById('clearBtn');
 
 function generateQRCodes() {
   const text = textInput.value.trim();
+  localStorage.setItem('qrInput', text);
   qrOutput.innerHTML = '';
 
   if (!text) {
@@ -194,6 +195,7 @@ function generateQRCodes() {
 function clearAll() {
   textInput.value = '';
   qrOutput.innerHTML = '';
+  localStorage.removeItem('qrInput');
   textInput.focus();
 }
 
@@ -209,6 +211,25 @@ textInput.addEventListener('keydown', (e) => {
     generateQRCodes();
   }
 });
+
+(function () {
+  const inputFromUrl =
+    new URLSearchParams(window.location.search).get('input');
+
+  if (inputFromUrl) {
+    textInput.value = inputFromUrl;
+    localStorage.setItem('qrInput', inputFromUrl);
+    generateQRCodes();
+    return;
+  }
+
+  const savedText = localStorage.getItem('qrInput');
+
+  if (savedText) {
+    textInput.value = savedText;
+    generateQRCodes();
+  }
+})();
 
 </script>
 </body>
