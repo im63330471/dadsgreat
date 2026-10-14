@@ -212,24 +212,21 @@ textInput.addEventListener('keydown', (e) => {
   }
 });
 
-(function () {
-  const inputFromUrl =
-    new URLSearchParams(window.location.search).get('input');
+const inputFromUrl =
+  new URLSearchParams(window.location.search).get('input');
 
-  if (inputFromUrl) {
-    textInput.value = inputFromUrl;
-    localStorage.setItem('qrInput', inputFromUrl);
-    generateQRCodes();
-    return;
-  }
-
+if (inputFromUrl) {
+  textInput.value = inputFromUrl;
+  localStorage.setItem('qrInput', inputFromUrl);
+  generateQRCodes();
+} else {
   const savedText = localStorage.getItem('qrInput');
 
   if (savedText) {
     textInput.value = savedText;
     generateQRCodes();
   }
-})();
+}
 
 </script>
 </body>
